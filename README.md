@@ -368,7 +368,6 @@ Found a bug? [Open an Issue](https://github.com/devsebastianops/watt-tf/issues)
 ## Roadmap
 
 - [ ] Plugin system for custom transformers
-- [ ] Jinja2 template engine for complex scenarios
 - [ ] Interactive CLI mode
 - [ ] VS Code extension
 
