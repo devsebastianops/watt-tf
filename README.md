@@ -2,15 +2,70 @@
 
 > **W**att **TF** is a powerful CLI tool that transforms JSON and YAML configurations into Terraform JSON files - Because writing complex nested loops in HCL shouldn't make you question your career choices
 
-Generate Terraform configuration from structured application data.
 
-Ideal for:
+## Why?
 
-- Internal Developer Platforms
-- SaaS platforms
-- Multi-tenant deployments
-- CI/CD pipelines
-- Self-service infrastructure portals
+Hi, I'm Sebastian :wave:
+
+Like many engineers, I have a love-hate relationship with Terraform ( hate especially when dealing with complex HCL structures ). And I've also learned that most developers don't want to write Terraform just to deploy an application. 
+
+The challenge isn't building infrastructure. It's making infrastructure easy to consume.
+
+### Infrastructure with Dev Teams
+A common setup looks like this:
+
+The infrastructure team builds reusable Terraform modules.
+
+The platform team defines standards, networking, security, IAM, monitoring, and compliance.
+
+Development teams simply want to deploy their applications.
+
+In theory, Terraform modules should make this easy.
+
+In practice, developers still need to understand Terraform, module inputs, provider-specific options, and dozens of configuration parameters that they often shouldn't have to care about.
+
+As organizations grow, every team starts building its own glue code.
+
+
+### The Pain
+
+Platform teams want consistency.
+
+Developers want simplicity.
+
+These goals often conflict.
+
+Infrastructure teams want to expose a small, opinionated interface:
+
+{
+  "service": "orders",
+  "image": "ghcr.io/company/orders:v1",
+  "database": true
+}
+
+Instead, developers end up interacting directly with complex Terraform modules containing dozens of variables, many of which should remain implementation details.
+
+The result is duplicated tooling, inconsistent deployments, and platform teams spending valuable time maintaining custom generators instead of improving their infrastructure.
+
+### The Solution: Watt TF
+
+Watt TF is a generic transformation engine that sits between your application configuration and Terraform.
+
+Instead of asking developers to write Terraform, platform teams define how structured input maps to reusable Terraform modules and resources.
+
+With Watt TF, platform teams can:
+
+- Build simple, stable interfaces for developers.
+- Reuse existing Terraform modules without exposing unnecessary complexity.
+- Apply organization-wide defaults and standards.
+- Compose infrastructure from reusable building blocks.
+- Generate consistent Terraform JSON from structured data.
+
+Developers don't need to understand your Terraform implementation.
+
+They only need to describe what they want.
+
+Watt TF takes care of how it's built.
 
 ---
 
