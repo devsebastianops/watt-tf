@@ -10,7 +10,7 @@ import (
 
 var interpRegex = regexp.MustCompile(`\${([^}]+)}`)
 
-func interpolate(val any, env *cel.Env, inputData map[string]any) (any, error) {
+func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[string]string) (any, error) {
 	// Check the type of val and handle accordingly
 	switch v := val.(type) {
 
@@ -23,7 +23,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any) (any, error) {
 
 		// There is only one match and the whole string is the interpolation, we can evaluate it directly
 		if len(matches) == 1 && matches[0][0] == v {
-			return evalCelExpression(matches[0][1], env, inputData)
+			return evalCelExpression(matches[0][1], env, inputData, envVars)
 		}
 
 		// There are multiple matches or the interpolation is part of a larger string, we need to replace them
@@ -32,7 +32,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any) (any, error) {
 			fullMatch := match[0]  // ${input.env}
 			expression := match[1] // input.env
 
-			celVal, err := evalCelExpression(expression, env, inputData)
+			celVal, err := evalCelExpression(expression, env, inputData, envVars)
 			if err != nil {
 				return nil, err
 			}
@@ -58,7 +58,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any) (any, error) {
 				continue
 			}
 
-			interpItem, err := interpolate(item, env, inputData)
+			interpItem, err := interpolate(item, env, inputData, envVars)
 			if err != nil {
 				return nil, err
 			}
@@ -71,7 +71,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any) (any, error) {
 	}
 }
 
-func evalCelExpression(expr string, env *cel.Env, inputData map[string]any) (any, error) {
+func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string) (any, error) {
 	ast, iss := env.Compile(expr)
 	if iss.Err() != nil {
 		return nil, fmt.Errorf("syntax error in interpolation '%s': %v", expr, iss.Err())
@@ -80,7 +80,7 @@ func evalCelExpression(expr string, env *cel.Env, inputData map[string]any) (any
 	if err != nil {
 		return nil, err
 	}
-	out, _, err := program.Eval(map[string]any{"input": inputData})
+	out, _, err := program.Eval(map[string]any{"input": inputData, "env": envVars})
 	if err != nil {
 		return nil, err
 	}

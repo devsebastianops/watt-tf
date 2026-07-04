@@ -37,6 +37,27 @@ func TestE2EExamples(t *testing.T) {
 
 // runE2ETest runs a single example through the full pipeline
 func runE2ETest(t *testing.T, examplePath string) {
+	exampleName := filepath.Base(examplePath)
+
+	// Set up environment variables for specific test cases
+	if exampleName == "13-env-variables" {
+		os.Setenv("DEPLOYMENT_ENV", "production")
+		os.Setenv("DEPLOYMENT_REGION", "us-east-1")
+		// Restore original values after test if they existed
+		defer func() {
+			if original, exists := os.LookupEnv("DEPLOYMENT_ENV"); exists {
+				os.Setenv("DEPLOYMENT_ENV", original)
+			} else {
+				os.Unsetenv("DEPLOYMENT_ENV")
+			}
+			if original, exists := os.LookupEnv("DEPLOYMENT_REGION"); exists {
+				os.Setenv("DEPLOYMENT_REGION", original)
+			} else {
+				os.Unsetenv("DEPLOYMENT_REGION")
+			}
+		}()
+	}
+
 	// Find input file (either .json or .yaml)
 	var inputFile string
 	for _, ext := range []string{".json", ".yaml", ".yml"} {

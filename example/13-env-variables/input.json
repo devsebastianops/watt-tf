@@ -1,0 +1,5 @@
+{
+  "service_name": "api-gateway",
+  "cpu_cores": 4,
+  "memory_gb": 8
+}

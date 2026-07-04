@@ -2,6 +2,7 @@ package transformer
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/devsebastianops/watt-tf/internal/config"
@@ -13,9 +14,11 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 
 	transformables := config.Transform
 	result := map[string]interface{}{}
+	envVars := getEnvVars()
 
 	env, _ := cel.NewEnv(
 		cel.Variable("input", cel.MapType(cel.StringType, cel.AnyType)),
+		cel.Variable("env", cel.MapType(cel.StringType, cel.StringType)),
 		cel.Macros(cel.StandardMacros...),
 	)
 
@@ -25,7 +28,7 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 		condition := transformable.If
 
 		// 0. Interpolate target (supports dynamic names like: resource.aws_s3.${input.name})
-		interpolatedTarget, err := interpolate(target, env, input)
+		interpolatedTarget, err := interpolate(target, env, input, envVars)
 		if err != nil {
 			return nil, fmt.Errorf("failed to interpolate target '%s': %w", target, err)
 		}
@@ -36,7 +39,7 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 		// 1. Evaluate condition (if specified)
 		if condition != "" {
 			logger.Debug("evaluating condition", "target", target, "condition", condition)
-			shouldExecute, err := evalCelCondition(condition, env, input)
+			shouldExecute, err := evalCelCondition(condition, env, input, envVars)
 			if err != nil {
 				return nil, fmt.Errorf("failed to evaluate condition '%s': %w", condition, err)
 			}
@@ -47,7 +50,7 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 		}
 
 		// 2. Interpolate
-		interpolatedValue, err := interpolate(value, env, input)
+		interpolatedValue, err := interpolate(value, env, input, envVars)
 		if err != nil {
 			return nil, err
 		}
@@ -103,4 +106,14 @@ func unflatten(result map[string]any, path string, value any) {
 	}
 
 	current[lastPart] = value
+}
+
+// getEnvVars collects all environment variables into a map
+func getEnvVars() map[string]string {
+	envMap := make(map[string]string)
+	for _, envVar := range os.Environ() {
+		key, value, _ := strings.Cut(envVar, "=")
+		envMap[key] = value
+	}
+	return envMap
 }

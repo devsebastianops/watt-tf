@@ -1,0 +1,9 @@
+transform:
+  - target: resource.compute_instance.config
+    if: env.DEPLOYMENT_ENV == 'production'
+    value:
+      name: "${input.service_name}"
+      cpu_cores: "${input.cpu_cores}"
+      memory_gb: "${input.memory_gb}"
+      environment: "${env.DEPLOYMENT_ENV}"
+      region: "${env.DEPLOYMENT_REGION}"
