@@ -1,4 +1,4 @@
-# wtf - Generic Terraform JSON Builder
+![Cover](./docs/assets/cover.png)
 
 > **W**att **TF** is a powerful CLI tool that transforms JSON and YAML configurations into Terraform JSON files - Because writing complex nested loops in HCL shouldn't make you question your career choices
 
