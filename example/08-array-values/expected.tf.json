@@ -7,8 +7,8 @@
           "prod"
         ],
         "tags": [
-          "${input.tags.0}",
-          "${input.tags.1}",
+          "web",
+          "production",
           "terraform"
         ]
       }

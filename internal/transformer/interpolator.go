@@ -66,6 +66,24 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 		}
 		return newMap, nil
 
+	case []interface{}:
+		// If the value is an array, recursively interpolate its items
+		newArray := make([]interface{}, 0, len(v))
+		for _, item := range v {
+			// Handle nil values explicitly
+			if item == nil {
+				newArray = append(newArray, nil)
+				continue
+			}
+
+			interpItem, err := interpolate(item, env, inputData, envVars)
+			if err != nil {
+				return nil, err
+			}
+			newArray = append(newArray, interpItem)
+		}
+		return newArray, nil
+
 	default:
 		return v, nil // For other types (like int, float, bool), return as is
 	}

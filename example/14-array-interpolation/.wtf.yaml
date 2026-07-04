@@ -1,0 +1,5 @@
+transform:
+  - target: resource.config
+    value:
+      enabled: true
+      tags: ${input.tags}
