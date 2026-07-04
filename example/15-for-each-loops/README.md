@@ -21,11 +21,11 @@ This example demonstrates the `for_each` directive for iterating over arrays in 
 
 ```yaml
 transform:
-  - target: "resource.type.{{ item.field | filter }}"
+  - target: "resource.type.${item.field}"
     for_each: input.array_path
     value:
-      field1: "{{ item.prop1 }}"
-      field2: "{{ item_index + 1 }}"
+      field1: "${item.prop1}"
+      field2: "${item_index + 1}"
       # ... other fields
 ```
 
@@ -45,23 +45,23 @@ transform:
 
 ```yaml
 transform:
-  - target: "resource.job.{{ item.name | snake_case }}"
+  - target: "resource.job.${item.name}"
     for_each: input.jobs
     value:
-      name: "{{ item.name }}"
+      name: "${item.name}"
       enabled: true
-      id: "job-{{ item_index + 1 }}"
+      id: "job-${item_index + 1}"
 ```
 
 **Breakdown:**
 - `for_each: input.jobs` - Iterate over the `jobs` array
-- `target: "resource.job.{{ item.name | snake_case }}"` - Dynamic target using item data
-  - First iteration: `resource.job.my_job`
-  - Second iteration: `resource.job.another_job`
-  - Third iteration: `resource.job.third_job`
+- `target: "resource.job.${item.name}"` - Dynamic target using item data
+  - First iteration: `resource.job.my-job`
+  - Second iteration: `resource.job.another-job`
+  - Third iteration: `resource.job.third-job`
 - `item` - Current job object (has `.name` property)
 - `item_index` - 0, 1, 2 for each iteration
-- `id: "job-{{ item_index + 1 }}"` - Results in job-1, job-2, job-3
+- `id: "job-${item_index + 1}"` - Results in job-1, job-2, job-3
 
 ## Output
 
@@ -86,12 +86,12 @@ You can also use `if` conditions with `for_each`:
 
 ```yaml
 transform:
-  - target: "resource.job.{{ item.name | snake_case }}"
+  - target: "resource.job.${item.name}"
     for_each: input.jobs
     if: "item.enabled == true"  # Only process enabled jobs
     value:
-      name: "{{ item.name }}"
-      id: "job-{{ item_index + 1 }}"
+      name: "${item.name}"
+      id: "job-${item_index + 1}"
 ```
 
 ## How to Test
