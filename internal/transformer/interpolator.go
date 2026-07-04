@@ -120,3 +120,107 @@ func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envV
 
 	return val, nil
 }
+
+// interpolateWithItem is like interpolate but also includes item and item_index variables
+func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVars map[string]string, item any, itemIndex int) (any, error) {
+	switch v := val.(type) {
+
+	case string:
+		matches := interpRegex.FindAllStringSubmatch(v, -1)
+		if len(matches) == 0 {
+			return v, nil
+		}
+
+		if len(matches) == 1 && matches[0][0] == v {
+			return evalCelExpressionWithItem(matches[0][1], env, inputData, envVars, item, itemIndex)
+		}
+
+		resultStr := v
+		for _, match := range matches {
+			fullMatch := match[0]
+			expression := match[1]
+
+			celVal, err := evalCelExpressionWithItem(expression, env, inputData, envVars, item, itemIndex)
+			if err != nil {
+				return nil, err
+			}
+
+			var replacement string
+			if celVal == nil {
+				replacement = "null"
+			} else {
+				replacement = fmt.Sprintf("%v", celVal)
+			}
+			resultStr = strings.Replace(resultStr, fullMatch, replacement, 1)
+		}
+		return resultStr, nil
+
+	case map[string]any:
+		newMap := make(map[string]any)
+		for k, mapItem := range v {
+			if mapItem == nil {
+				newMap[k] = nil
+				continue
+			}
+
+			interpItem, err := interpolateWithItem(mapItem, env, inputData, envVars, item, itemIndex)
+			if err != nil {
+				return nil, err
+			}
+			newMap[k] = interpItem
+		}
+		return newMap, nil
+
+	case []interface{}:
+		newArray := make([]interface{}, 0, len(v))
+		for _, arrayItem := range v {
+			if arrayItem == nil {
+				newArray = append(newArray, nil)
+				continue
+			}
+
+			interpItem, err := interpolateWithItem(arrayItem, env, inputData, envVars, item, itemIndex)
+			if err != nil {
+				return nil, err
+			}
+			newArray = append(newArray, interpItem)
+		}
+		return newArray, nil
+
+	default:
+		return v, nil
+	}
+}
+
+func evalCelExpressionWithItem(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string, item any, itemIndex int) (any, error) {
+	ast, iss := env.Compile(expr)
+	if iss.Err() != nil {
+		return nil, fmt.Errorf("syntax error in interpolation '%s': %v", expr, iss.Err())
+	}
+	program, err := env.Program(ast)
+	if err != nil {
+		return nil, err
+	}
+	out, _, err := program.Eval(map[string]any{
+		"input":      inputData,
+		"env":        envVars,
+		"item":       item,
+		"item_index": itemIndex,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	val := out.Value()
+
+	if val == nil {
+		return nil, nil
+	}
+
+	valStr := fmt.Sprintf("%v", val)
+	if valStr == "<nil>" || valStr == "NULL_VALUE" {
+		return nil, nil
+	}
+
+	return val, nil
+}

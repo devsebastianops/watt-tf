@@ -1,0 +1,7 @@
+transform:
+  - target: "resource.job.${item.name}"
+    for_each: input.jobs
+    value:
+      name: "${item.name}"
+      enabled: true
+      id: "job-${item_index + 1}"

@@ -1,0 +1,13 @@
+{
+  "jobs": [
+    {
+      "name": "my-job"
+    },
+    {
+      "name": "another-job"
+    },
+    {
+      "name": "third-job"
+    }
+  ]
+}

@@ -19,6 +19,8 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 	env, _ := cel.NewEnv(
 		cel.Variable("input", cel.MapType(cel.StringType, cel.AnyType)),
 		cel.Variable("env", cel.MapType(cel.StringType, cel.StringType)),
+		cel.Variable("item", cel.AnyType),
+		cel.Variable("item_index", cel.IntType),
 		cel.Macros(cel.StandardMacros...),
 	)
 
@@ -26,43 +28,120 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 		target := transformable.Target
 		value := transformable.Value
 		condition := transformable.If
+		forEach := transformable.ForEach
 
-		// 0. Interpolate target (supports dynamic names like: resource.aws_s3.${input.name})
-		interpolatedTarget, err := interpolate(target, env, input, envVars)
-		if err != nil {
-			return nil, fmt.Errorf("failed to interpolate target '%s': %w", target, err)
-		}
-		target = interpolatedTarget.(string) // Target must result in a string
+		// Check if this is a for_each transformation
+		if forEach != "" {
+			logger.Debug("processing for_each transformation", "target", target, "for_each", forEach)
 
-		logger.Debug("processing transformation", "target", target, "has_condition", condition != "")
+			// Evaluate the for_each expression to get the array
+			forEachCompiled, iss := env.Compile(forEach)
+			if iss.Err() != nil {
+				return nil, fmt.Errorf("failed to compile for_each expression '%s': %w", forEach, iss.Err())
+			}
 
-		// 1. Evaluate condition (if specified)
-		if condition != "" {
-			logger.Debug("evaluating condition", "target", target, "condition", condition)
-			shouldExecute, err := evalCelCondition(condition, env, input, envVars)
+			// Evaluate with base context (no item yet)
+			forEachProgram, err := env.Program(forEachCompiled)
 			if err != nil {
-				return nil, fmt.Errorf("failed to evaluate condition '%s': %w", condition, err)
+				return nil, fmt.Errorf("failed to create for_each program '%s': %w", forEach, err)
 			}
-			if !shouldExecute {
-				logger.Debug("condition not met, skipping", "target", target)
-				continue
+
+			evalResult, _, err := forEachProgram.Eval(map[string]any{
+				"input":      input,
+				"env":        envVars,
+				"item":       nil,
+				"item_index": 0,
+			})
+			if err != nil {
+				return nil, fmt.Errorf("failed to evaluate for_each expression '%s': %w", forEach, err)
 			}
-		}
 
-		// 2. Interpolate
-		interpolatedValue, err := interpolate(value, env, input, envVars)
-		if err != nil {
-			return nil, err
-		}
+			// Convert items to array
+			var itemArray []interface{}
+			switch v := evalResult.Value().(type) {
+			case []interface{}:
+				itemArray = v
+			default:
+				return nil, fmt.Errorf("for_each expression must return an array, got %T", v)
+			}
 
-		// 3. Span up the result (Unflattening)
-		logger.Debug("interpolation completed", "target", target)
-		// Wir casten interpolatedValue zu map[string]any, da dein Value-Typ im Struct so definiert ist
-		if mapVal, ok := interpolatedValue.(map[string]any); ok {
-			unflatten(result, target, mapVal)
+			logger.Debug("for_each resolved to array", "count", len(itemArray))
+
+			// Process each item in the array
+			for idx, item := range itemArray {
+				logger.Debug("processing for_each item", "index", idx, "item_type", fmt.Sprintf("%T", item))
+
+				// Interpolate target with item context
+				interpolatedTarget, err := interpolateWithItem(target, env, input, envVars, item, idx)
+				if err != nil {
+					return nil, fmt.Errorf("failed to interpolate target '%s' for item %d: %w", target, idx, err)
+				}
+				targetStr := interpolatedTarget.(string)
+
+				// Evaluate condition with item context
+				if condition != "" {
+					logger.Debug("evaluating condition with item", "condition", condition, "index", idx)
+					shouldExecute, err := evalCelConditionWithItem(condition, env, input, envVars, item, idx)
+					if err != nil {
+						return nil, fmt.Errorf("failed to evaluate condition '%s' for item %d: %w", condition, idx, err)
+					}
+					if !shouldExecute {
+						logger.Debug("condition not met for item, skipping", "index", idx)
+						continue
+					}
+				}
+
+				// Interpolate value with item context
+				interpolatedValue, err := interpolateWithItem(value, env, input, envVars, item, idx)
+				if err != nil {
+					return nil, fmt.Errorf("failed to interpolate value for item %d: %w", idx, err)
+				}
+
+				// Unflatten the result
+				if mapVal, ok := interpolatedValue.(map[string]any); ok {
+					unflatten(result, targetStr, mapVal)
+				} else {
+					unflatten(result, targetStr, interpolatedValue)
+				}
+			}
+
 		} else {
-			// Falls der Nutzer ein primitives Value wie einen nackten String/Int übergibt
-			unflatten(result, target, interpolatedValue)
+			// Standard transformation (no for_each)
+			// 0. Interpolate target (supports dynamic names like: resource.aws_s3.${input.name})
+			interpolatedTarget, err := interpolate(target, env, input, envVars)
+			if err != nil {
+				return nil, fmt.Errorf("failed to interpolate target '%s': %w", target, err)
+			}
+			target = interpolatedTarget.(string) // Target must result in a string
+
+			logger.Debug("processing transformation", "target", target, "has_condition", condition != "")
+
+			// 1. Evaluate condition (if specified)
+			if condition != "" {
+				logger.Debug("evaluating condition", "target", target, "condition", condition)
+				shouldExecute, err := evalCelCondition(condition, env, input, envVars)
+				if err != nil {
+					return nil, fmt.Errorf("failed to evaluate condition '%s': %w", condition, err)
+				}
+				if !shouldExecute {
+					logger.Debug("condition not met, skipping", "target", target)
+					continue
+				}
+			}
+
+			// 2. Interpolate
+			interpolatedValue, err := interpolate(value, env, input, envVars)
+			if err != nil {
+				return nil, err
+			}
+
+			// 3. Span up the result (Unflattening)
+			logger.Debug("interpolation completed", "target", target)
+			if mapVal, ok := interpolatedValue.(map[string]any); ok {
+				unflatten(result, target, mapVal)
+			} else {
+				unflatten(result, target, interpolatedValue)
+			}
 		}
 	}
 
