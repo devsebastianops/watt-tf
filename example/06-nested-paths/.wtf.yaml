@@ -1,0 +1,5 @@
+transform:
+  - target: resource.aws_vpc.main.subnets.primary.tags
+    value:
+      Name: "${input.app.name}-subnet"
+      Tier: "${input.app.tier}"

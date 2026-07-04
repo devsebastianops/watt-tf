@@ -1,0 +1,16 @@
+{
+  "resource": {
+    "aws_vpc": {
+      "main": {
+        "subnets": {
+          "primary": {
+            "tags": {
+              "Name": "web-app-subnet",
+              "Tier": "backend"
+            }
+          }
+        }
+      }
+    }
+  }
+}

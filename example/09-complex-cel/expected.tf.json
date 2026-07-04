@@ -1,0 +1,10 @@
+{
+  "resource": {
+    "cache": {
+      "instance": {
+        "enabled": true,
+        "region": "us-west-2"
+      }
+    }
+  }
+}

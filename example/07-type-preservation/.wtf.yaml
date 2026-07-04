@@ -1,0 +1,7 @@
+transform:
+  - target: resource.container.config
+    value:
+      port: ${input.port}
+      enable_cors: ${input.enable_cors}
+      worker_threads: ${input.worker_threads}
+      description: "App listening on port ${input.port}"

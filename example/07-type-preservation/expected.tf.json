@@ -1,0 +1,12 @@
+{
+  "resource": {
+    "container": {
+      "config": {
+        "description": "App listening on port 8080",
+        "enable_cors": true,
+        "port": 8080,
+        "worker_threads": 4
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+    "cloudrun": {
+        "port": 8080,
+        "image": "gcr.io/cloudrun/hello"
+    }
+}

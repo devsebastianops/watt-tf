@@ -1,0 +1,17 @@
+{
+  "resource": {
+    "aws_instance": {
+      "server": {
+        "allowed_environments": [
+          "staging",
+          "prod"
+        ],
+        "tags": [
+          "${input.tags.0}",
+          "${input.tags.1}",
+          "terraform"
+        ]
+      }
+    }
+  }
+}

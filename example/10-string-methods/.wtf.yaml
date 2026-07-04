@@ -1,0 +1,14 @@
+transform:
+  - target: resource.iam_role.admin
+    if: input.email.startsWith('admin@')
+    value:
+      name: "admin_role"
+      description: "Admin for ${input.email}"
+  - target: resource.dns_record.main
+    if: input.domain.contains('myapp')
+    value:
+      domain: "${input.domain}"
+  - target: resource.deployment.app
+    if: input.stage == 'production'
+    value:
+      stage: "${input.stage}"

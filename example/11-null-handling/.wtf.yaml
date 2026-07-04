@@ -1,0 +1,6 @@
+transform:
+  - target: resource.app.config
+    value:
+      name: "${input.app_name}"
+      optional: ${input.optional_field}
+      tags: ${input.empty_list}

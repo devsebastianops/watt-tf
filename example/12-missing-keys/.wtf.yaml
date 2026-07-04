@@ -1,0 +1,5 @@
+transform:
+  - target: resource.server.main
+    value:
+      name: "my-server"
+      existing_key: "${input.valid_input}"

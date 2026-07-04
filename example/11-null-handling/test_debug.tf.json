@@ -1,0 +1,11 @@
+{
+  "resource": {
+    "app": {
+      "config": {
+        "name": "myapp",
+        "optional": null,
+        "tags": []
+      }
+    }
+  }
+}

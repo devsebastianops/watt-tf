@@ -1,0 +1,6 @@
+{
+  "env": "production",
+  "enable_cache": true,
+  "enable_logging": false,
+  "region": "us-west-2"
+}

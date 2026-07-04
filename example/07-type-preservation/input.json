@@ -1,0 +1,5 @@
+{
+  "port": 8080,
+  "enable_cors": true,
+  "worker_threads": 4
+}

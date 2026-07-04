@@ -1,0 +1,205 @@
+# ==============================================================================
+# Go Project Ignore Rules
+# ==============================================================================
+
+# Build artifacts and binaries
+bin/
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.html
+coverage.out
+
+# Dependency directories
+vendor/
+go.sum.lock
+
+# Go workspace file
+go.work.sum
+
+# ==============================================================================
+# IDE & Editor Files
+# ==============================================================================
+
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+
+# GoLand / IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+*.swp
+*.swo
+*~
+
+# Vim/Neovim
+.vim/
+*.vim
+*.swp
+*.swo
+*~
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# ==============================================================================
+# OS-Specific Files
+# ==============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*~.nib
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+
+# ==============================================================================
+# Environment & Configuration
+# ==============================================================================
+
+# Environment files (secrets, keys, configs)
+.env
+.env.local
+.env.*.local
+.env.secret
+
+# Local configuration
+config.local.yaml
+config.local.json
+config.local.yml
+
+# Terraform files (if applicable)
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraform/
+.terraform.lock.hcl
+
+# ==============================================================================
+# Project Specific
+# ==============================================================================
+
+# Build output
+watt.tf.json
+output.tf.json
+*.tf.json
+
+# Logs
+*.log
+logs/
+wtf.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Test results
+test-results/
+
+# Profiling data
+*.prof
+*.pprof
+
+# ==============================================================================
+# Common Development Artifacts
+# ==============================================================================
+
+# Compiled documentation
+docs/_build/
+*.md~
+
+# Node modules (if using any Node tooling)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python (if using Python scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+
+# ==============================================================================
+# Security & Sensitive Files
+# ==============================================================================
+
+# Private keys
+*.key
+*.pem
+*.p8
+*.p12
+*.pfx
+
+# API tokens & credentials
+.credentials
+.aws/
+.gcp/
+credentials.json
+
+# SSH keys
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# ==============================================================================
+# CI/CD & Build System
+# ==============================================================================
+
+# GitHub Actions
+.github/workflows/cache/
+
+# GitLab CI
+.gitlab-ci.yml.local
+
+# Jenkins
+Jenkinsfile.local
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# ==============================================================================
+# Archives & Backups
+# ==============================================================================
+
+*.zip
+*.tar.gz
+*.tar
+*.rar
+*.7z
+*.backup
+*.bak
+*.old
+

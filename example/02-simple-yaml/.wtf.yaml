@@ -1,0 +1,5 @@
+transform:
+  - target: resource.google_cloud_run_service.default
+    value:
+      port: ${input.cloudrun.port}
+      image: ${input.cloudrun.image}

@@ -1,0 +1,20 @@
+{
+  "resource": {
+    "deployment": {
+      "app": {
+        "stage": "production"
+      }
+    },
+    "dns_record": {
+      "main": {
+        "domain": "myapp.com"
+      }
+    },
+    "iam_role": {
+      "admin": {
+        "description": "Admin for admin@example.com",
+        "name": "admin_role"
+      }
+    }
+  }
+}

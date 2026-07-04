@@ -1,0 +1,10 @@
+{
+  "resource": {
+    "google_cloud_run_service": {
+      "default": {
+        "image": "gcr.io/cloudrun/hello",
+        "port": 8080
+      }
+    }
+  }
+}

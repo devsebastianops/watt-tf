@@ -1,0 +1,10 @@
+{
+  "resource": {
+    "server": {
+      "main": {
+        "existing_key": "value",
+        "name": "my-server"
+      }
+    }
+  }
+}

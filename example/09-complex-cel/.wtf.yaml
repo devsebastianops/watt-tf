@@ -1,0 +1,10 @@
+transform:
+  - target: resource.cache.instance
+    if: input.enable_cache && (input.env == 'production' || input.env == 'staging')
+    value:
+      enabled: true
+      region: "${input.region}"
+  - target: resource.logging.service
+    if: input.enable_logging && input.env == 'production'
+    value:
+      enabled: true

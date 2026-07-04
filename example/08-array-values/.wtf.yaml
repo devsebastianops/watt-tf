@@ -1,0 +1,5 @@
+transform:
+  - target: resource.aws_instance.server
+    value:
+      tags: ["${input.tags.0}", "${input.tags.1}", "terraform"]
+      allowed_environments: ${input.environments}

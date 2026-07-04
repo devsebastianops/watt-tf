@@ -1,0 +1,11 @@
+transform:
+  - target: resource.google_cloud_run_service.default
+    if: input.cloudrun.port < 9000
+    value:
+      port: ${input.cloudrun.port}
+      image: ${input.cloudrun.image}
+  - target: resource.google_cloud_run_service.not_so_default
+    if: input.cloudrun.port >= 9000
+    value:
+      port: ${input.cloudrun.port}
+      image: ${input.cloudrun.image}

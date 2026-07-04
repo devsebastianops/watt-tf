@@ -1,0 +1,4 @@
+{
+  "tags": ["web", "production", "api"],
+  "environments": ["staging", "prod"]
+}
