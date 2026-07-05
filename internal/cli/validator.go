@@ -43,7 +43,7 @@ func validateInputSchema(input map[string]any, schemaFile string) error {
 		for i, desc := range result.Errors() {
 			errorMsg += fmt.Sprintf("  %d. %s\n", i+1, desc.String())
 		}
-		return fmt.Errorf(errorMsg)
+		return fmt.Errorf("%s", errorMsg)
 	}
 
 	return nil
