@@ -1,6 +1,7 @@
 package config
 
 type Config struct {
+	Include   []string        `yaml:"include,omitempty"`
 	Transform []Transformable `yaml:"transform"`
 }
 

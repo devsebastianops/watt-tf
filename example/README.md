@@ -62,6 +62,32 @@ Comprehensive examples demonstrating all features of Watt TF.
     - Create condition logic based on string patterns
     - Perfect for naming conventions and validations
 
+11. **[13-env-variables](13-env-variables)** - Environment variables in expressions
+    - Access environment variables with the `env` CEL variable
+    - Use environment variables in conditions and interpolations
+    - Perfect for environment-specific configurations
+
+### Advanced Iteration & Modularity
+
+12. **[14-array-interpolation](14-array-interpolation)** - Advanced array handling
+    - Interpolate entire arrays directly into configuration objects
+    - Preserve array types in output (numbers stay numbers, not strings)
+    - Mix literal and interpolated values within arrays
+    - Essential for complex list configurations
+
+13. **[15-for-each-loops](15-for-each-loops)** - Loop over arrays to generate multiple resources
+    - Use the `for_each` directive to iterate over input arrays
+    - Access current element with `item` and position with `item_index`
+    - Generate dynamic target names using `${item.field}`
+    - Combine with conditions for selective processing
+    - Build 1:N infrastructure from single array input
+
+14. **[17-includes](17-includes)** - Modular configuration with file includes
+    - Split configuration across multiple files using the `include` directive
+    - Include transforms are processed before main transforms
+    - Support relative paths and recursive includes
+    - Perfect for reusable components and large configs
+
 ### Edge Cases & Robustness
 
 11. **[11-null-handling](11-null-handling)** - Null and empty values
@@ -114,7 +140,10 @@ go test ./tests/e2e -v
 3. 04-conditions → Add conditional logic
 4. 05-deep-merge → Handle complex configs
 5. 10-string-methods → Advanced conditions
-6. Explore others based on your needs
+6. 13-env-variables → Use environment variables
+7. 15-for-each-loops → Generate multiple resources from arrays
+8. 17-includes → Build modular configurations
+9. Explore others based on your needs
 
 ---
 
@@ -122,19 +151,24 @@ go test ./tests/e2e -v
 
 | Feature | Example(s) |
 |---------|-----------|
-| JSON Input | 01, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12 |
+| JSON Input | 01, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 17 |
 | YAML Input | 02 |
-| String Interpolation | 01, 02, 03, 04, 05, 06, 07, 08, 09, 10 |
-| Target Interpolation | 03, 09, 10 |
-| Simple Conditions | 04, 09, 10 |
+| String Interpolation | 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 13, 14, 15, 17 |
+| Target Interpolation | 03, 09, 10, 15 |
+| Simple Conditions | 04, 09, 10, 13 |
 | Complex Conditions | 09 |
 | CEL String Methods | 10 |
+| CEL Arithmetic | 15 |
+| Environment Variables | 13 |
 | Deep Merge | 05 |
 | Nested Paths | 06 |
 | Type Preservation | 07 |
-| Arrays | 08 |
+| Arrays | 08, 14 |
+| Array Iteration (for_each) | 15 |
 | Null Handling | 11 |
 | Error Handling | 12 |
+| Config Includes | 17 |
+| Modular Configs | 17 |
 
 ---
 

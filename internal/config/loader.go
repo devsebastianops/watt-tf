@@ -2,27 +2,82 @@ package config
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/devsebastianops/watt-tf/internal/parser"
 )
 
 func LoadConfig(filePath string) (*Config, error) {
+	config := &Config{
+		Transform: []Transformable{},
+	}
+
+	// Load the main config file
 	configMap, err := parser.ParseYAML(filePath)
 	if err != nil {
 		return nil, err
 	}
 
-	config := Config{
+	// Get the directory of the config file for resolving relative paths
+	configDir := filepath.Dir(filePath)
+
+	// Parse includes if present
+	if includes, ok := configMap["include"].([]interface{}); ok {
+		for _, include := range includes {
+			if includePath, ok := include.(string); ok {
+				// Resolve relative paths from config directory
+				if !filepath.IsAbs(includePath) {
+					includePath = filepath.Join(configDir, includePath)
+				}
+
+				// Recursively load included config
+				includedConfig, err := loadConfigWithoutIncludes(includePath)
+				if err != nil {
+					return nil, fmt.Errorf("failed to load included config '%s': %w", include, err)
+				}
+
+				// Append transforms from included config
+				config.Transform = append(config.Transform, includedConfig.Transform...)
+			}
+		}
+	}
+
+	// Parse main config transforms
+	mainConfig, err := loadConfigWithoutIncludes(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Append main config transforms
+	config.Transform = append(config.Transform, mainConfig.Transform...)
+
+	return config, nil
+}
+
+// loadConfigWithoutIncludes loads a single config file without processing includes
+func loadConfigWithoutIncludes(filePath string) (*Config, error) {
+	configMap, err := parser.ParseYAML(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	config := &Config{
 		Transform: []Transformable{},
 	}
 
+	// Parse transforms
 	transformList, ok := configMap["transform"].([]interface{})
 	if !ok {
-		return nil, fmt.Errorf("invalid transform list in config")
+		// If no transform list, return empty config
+		return config, nil
 	}
 
 	for _, transformable := range transformList {
-		transformableMap := transformable.(map[string]interface{})
+		transformableMap, ok := transformable.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("invalid transform entry")
+		}
+
 		target, ok := transformableMap["target"].(string)
 		if !ok {
 			return nil, fmt.Errorf("missing or invalid 'target' field")
@@ -53,5 +108,5 @@ func LoadConfig(filePath string) (*Config, error) {
 		})
 	}
 
-	return &config, nil
+	return config, nil
 }

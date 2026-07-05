@@ -1,0 +1,9 @@
+{
+  "cloudrun": {
+    "port": 8080,
+    "image": "my-app:latest"
+  },
+  "compute": {
+    "port": 5432
+  }
+}

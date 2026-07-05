@@ -1,0 +1,4 @@
+transform:
+  - target: resource.compute.default
+    value:
+      port: ${input.compute.port}
