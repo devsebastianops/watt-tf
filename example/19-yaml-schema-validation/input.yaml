@@ -1,0 +1,13 @@
+app:
+  name: my-application
+  version: "1.0.0"
+  environment: production
+  replicas: 3
+  image: my-app:latest
+  resources:
+    cpu: "500m"
+    memory: "512Mi"
+  health_check:
+    enabled: true
+    path: /health
+    port: 8080

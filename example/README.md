@@ -96,6 +96,12 @@ Comprehensive examples demonstrating all features of Watt TF.
     - Fail fast on invalid input with clear error messages
     - Essential for production environments where input quality matters
 
+16. **[19-yaml-schema-validation](19-yaml-schema-validation)** - Schema validation with YAML input
+    - Same schema validation works with both JSON and YAML inputs
+    - Format-agnostic validation (validates the parsed structure)
+    - Perfect for multi-format infrastructure configs
+    - Shows real-world Kubernetes deployment example
+
 ### Edge Cases & Robustness
 
 11. **[11-null-handling](11-null-handling)** - Null and empty values
@@ -151,8 +157,9 @@ go test ./tests/e2e -v
 6. 13-env-variables → Use environment variables
 7. 15-for-each-loops → Generate multiple resources from arrays
 8. 17-includes → Build modular configurations
-9. 18-schema-validation → Validate input quality
-10. Explore others based on your needs
+9. 18-schema-validation → Validate input quality (JSON)
+10. 19-yaml-schema-validation → Validate input quality (YAML)
+11. Explore others based on your needs
 
 ---
 
@@ -161,8 +168,8 @@ go test ./tests/e2e -v
 | Feature | Example(s) |
 |---------|-----------|
 | JSON Input | 01, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 17, 18 |
-| YAML Input | 02 |
-| String Interpolation | 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 13, 14, 15, 17, 18 |
+| YAML Input | 02, 19 |
+| String Interpolation | 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 13, 14, 15, 17, 18, 19 |
 | Target Interpolation | 03, 09, 10, 15 |
 | Simple Conditions | 04, 09, 10, 13 |
 | Complex Conditions | 09 |
@@ -178,8 +185,10 @@ go test ./tests/e2e -v
 | Error Handling | 12 |
 | Config Includes | 17 |
 | Modular Configs | 17 |
-| JSON Schema Validation | 18 |
-| Input Validation | 18 |
+| JSON Schema Validation | 18, 19 |
+| Input Validation (JSON) | 18 |
+| Input Validation (YAML) | 19 |
+| Format-agnostic Validation | 19 |
 
 ---
 

@@ -1,0 +1,15 @@
+transform:
+  - target: resource.kubernetes_deployment.app
+    value:
+      name: "${input.app.name}"
+      namespace: "${input.app.environment}"
+      image: "${input.app.image}"
+      replicas: ${input.app.replicas}
+      resources:
+        requests:
+          cpu: "${input.app.resources.cpu}"
+          memory: "${input.app.resources.memory}"
+      health_check:
+        enabled: ${input.app.health_check.enabled}
+        path: "${input.app.health_check.path}"
+        port: ${input.app.health_check.port}
