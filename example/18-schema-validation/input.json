@@ -1,0 +1,8 @@
+{
+  "server": {
+    "name": "prod-server",
+    "port": 8080,
+    "enabled": true,
+    "tags": ["production", "critical"]
+  }
+}

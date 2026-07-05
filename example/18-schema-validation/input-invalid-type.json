@@ -1,0 +1,6 @@
+{
+  "server": {
+    "name": "invalid-port-type",
+    "port": "8080"
+  }
+}

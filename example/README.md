@@ -88,6 +88,14 @@ Comprehensive examples demonstrating all features of Watt TF.
     - Support relative paths and recursive includes
     - Perfect for reusable components and large configs
 
+### Quality & Testing
+
+15. **[18-schema-validation](18-schema-validation)** - Input validation with JSON Schema
+    - Define input structure with JSON Schema
+    - Validate input before transformation with `--schema` flag
+    - Fail fast on invalid input with clear error messages
+    - Essential for production environments where input quality matters
+
 ### Edge Cases & Robustness
 
 11. **[11-null-handling](11-null-handling)** - Null and empty values
@@ -143,7 +151,8 @@ go test ./tests/e2e -v
 6. 13-env-variables → Use environment variables
 7. 15-for-each-loops → Generate multiple resources from arrays
 8. 17-includes → Build modular configurations
-9. Explore others based on your needs
+9. 18-schema-validation → Validate input quality
+10. Explore others based on your needs
 
 ---
 
@@ -151,9 +160,9 @@ go test ./tests/e2e -v
 
 | Feature | Example(s) |
 |---------|-----------|
-| JSON Input | 01, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 17 |
+| JSON Input | 01, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 17, 18 |
 | YAML Input | 02 |
-| String Interpolation | 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 13, 14, 15, 17 |
+| String Interpolation | 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 13, 14, 15, 17, 18 |
 | Target Interpolation | 03, 09, 10, 15 |
 | Simple Conditions | 04, 09, 10, 13 |
 | Complex Conditions | 09 |
@@ -169,6 +178,8 @@ go test ./tests/e2e -v
 | Error Handling | 12 |
 | Config Includes | 17 |
 | Modular Configs | 17 |
+| JSON Schema Validation | 18 |
+| Input Validation | 18 |
 
 ---
 

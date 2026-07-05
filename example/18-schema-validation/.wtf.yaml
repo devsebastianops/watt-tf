@@ -1,0 +1,7 @@
+transform:
+  - target: resource.compute_instance.server
+    value:
+      name: "${input.server.name}"
+      port: ${input.server.port}
+      enabled: ${input.server.enabled}
+      tags: ${input.server.tags}

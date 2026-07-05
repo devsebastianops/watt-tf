@@ -34,4 +34,5 @@ func help() {
 	fmt.Println("  --input <file>    Path to the input file (required)")
 	fmt.Println("  --output <file>   Path to the output file (default: watt.tf.json)")
 	fmt.Println("  --strict          Fail on missing keys (default: false = missing keys → null)")
+	fmt.Println("  --schema <file>   Path to JSON Schema for input validation (optional)")
 }

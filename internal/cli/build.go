@@ -16,6 +16,7 @@ var buildConfigFile = buildCmd.String("config", ".wtf.yaml", "Path to the config
 var buildInputFile = buildCmd.String("input", "", "Path to the input file")
 var buildOutputFile = buildCmd.String("output", "watt.tf.json", "Path to the output file")
 var buildStrict = buildCmd.Bool("strict", false, "Fail on missing keys (default: false = missing keys replaced with null)")
+var buildSchemaFile = buildCmd.String("schema", "", "Path to JSON Schema file for input validation (optional)")
 
 // var buildVerbose = buildCmd.Bool("verbose", false, "Enable verbose output") - For later
 
@@ -25,7 +26,8 @@ func build() error {
 		"config", *buildConfigFile,
 		"input", *buildInputFile,
 		"output", *buildOutputFile,
-		"strict", *buildStrict)
+		"strict", *buildStrict,
+		"schema", *buildSchemaFile)
 
 	config, configErr := config.LoadConfig(*buildConfigFile)
 	if configErr != nil {
@@ -40,6 +42,16 @@ func build() error {
 	}
 
 	logger.Debug("input parsed successfully", "input_keys", len(input))
+
+	// Validate input against schema if provided
+	if *buildSchemaFile != "" {
+		logger.Info("validating input against schema", "schema", *buildSchemaFile)
+		validationErr := validateInputSchema(input, *buildSchemaFile)
+		if validationErr != nil {
+			return validationErr
+		}
+		logger.Debug("input validation passed")
+	}
 
 	result, transformErr := transformer.Transform(input, config, *buildStrict)
 	if transformErr != nil {
