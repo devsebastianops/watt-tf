@@ -3,3 +3,4 @@ transform:
     value:
       name: "my-server"
       existing_key: "${input.valid_input}"
+      not_existing: "${input.missing_input}"

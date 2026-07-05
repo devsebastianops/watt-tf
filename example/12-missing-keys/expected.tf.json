@@ -3,7 +3,8 @@
     "server": {
       "main": {
         "existing_key": "value",
-        "name": "my-server"
+        "name": "my-server",
+        "not_existing": null
       }
     }
   }

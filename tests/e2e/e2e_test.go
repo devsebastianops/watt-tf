@@ -95,7 +95,7 @@ func runE2ETest(t *testing.T, examplePath string) {
 	}
 
 	// 3. Transform
-	result, err := transformer.Transform(input, cfg)
+	result, err := transformer.Transform(input, cfg, false)
 	if err != nil {
 		t.Fatalf("transformation failed: %v", err)
 	}

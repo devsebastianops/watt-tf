@@ -10,11 +10,17 @@ import (
 	"github.com/google/cel-go/cel"
 )
 
-func Transform(input map[string]interface{}, config *config.Config) (map[string]interface{}, error) {
+func Transform(input map[string]interface{}, config *config.Config, strict bool) (map[string]interface{}, error) {
 
 	transformables := config.Transform
 	result := map[string]interface{}{}
 	envVars := getEnvVars()
+
+	if strict {
+		logger.Info("running in strict mode: missing keys will cause errors")
+	} else {
+		logger.Info("running in lenient mode: missing keys will be replaced with null")
+	}
 
 	env, _ := cel.NewEnv(
 		cel.Variable("input", cel.MapType(cel.StringType, cel.AnyType)),
@@ -72,7 +78,7 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 				logger.Debug("processing for_each item", "index", idx, "item_type", fmt.Sprintf("%T", item))
 
 				// Interpolate target with item context
-				interpolatedTarget, err := interpolateWithItem(target, env, input, envVars, item, idx)
+				interpolatedTarget, err := interpolateWithItem(target, env, input, envVars, item, idx, strict)
 				if err != nil {
 					return nil, fmt.Errorf("failed to interpolate target '%s' for item %d: %w", target, idx, err)
 				}
@@ -81,7 +87,7 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 				// Evaluate condition with item context
 				if condition != "" {
 					logger.Debug("evaluating condition with item", "condition", condition, "index", idx)
-					shouldExecute, err := evalCelConditionWithItem(condition, env, input, envVars, item, idx)
+					shouldExecute, err := evalCelConditionWithItem(condition, env, input, envVars, item, idx, strict)
 					if err != nil {
 						return nil, fmt.Errorf("failed to evaluate condition '%s' for item %d: %w", condition, idx, err)
 					}
@@ -92,7 +98,7 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 				}
 
 				// Interpolate value with item context
-				interpolatedValue, err := interpolateWithItem(value, env, input, envVars, item, idx)
+				interpolatedValue, err := interpolateWithItem(value, env, input, envVars, item, idx, strict)
 				if err != nil {
 					return nil, fmt.Errorf("failed to interpolate value for item %d: %w", idx, err)
 				}
@@ -108,7 +114,7 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 		} else {
 			// Standard transformation (no for_each)
 			// 0. Interpolate target (supports dynamic names like: resource.aws_s3.${input.name})
-			interpolatedTarget, err := interpolate(target, env, input, envVars)
+			interpolatedTarget, err := interpolate(target, env, input, envVars, strict)
 			if err != nil {
 				return nil, fmt.Errorf("failed to interpolate target '%s': %w", target, err)
 			}
@@ -119,7 +125,7 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 			// 1. Evaluate condition (if specified)
 			if condition != "" {
 				logger.Debug("evaluating condition", "target", target, "condition", condition)
-				shouldExecute, err := evalCelCondition(condition, env, input, envVars)
+				shouldExecute, err := evalCelCondition(condition, env, input, envVars, strict)
 				if err != nil {
 					return nil, fmt.Errorf("failed to evaluate condition '%s': %w", condition, err)
 				}
@@ -130,7 +136,7 @@ func Transform(input map[string]interface{}, config *config.Config) (map[string]
 			}
 
 			// 2. Interpolate
-			interpolatedValue, err := interpolate(value, env, input, envVars)
+			interpolatedValue, err := interpolate(value, env, input, envVars, strict)
 			if err != nil {
 				return nil, err
 			}

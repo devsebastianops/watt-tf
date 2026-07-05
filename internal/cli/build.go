@@ -15,6 +15,7 @@ var buildCmd = flag.NewFlagSet("build", flag.ExitOnError)
 var buildConfigFile = buildCmd.String("config", ".wtf.yaml", "Path to the configuration file")
 var buildInputFile = buildCmd.String("input", "", "Path to the input file")
 var buildOutputFile = buildCmd.String("output", "watt.tf.json", "Path to the output file")
+var buildStrict = buildCmd.Bool("strict", false, "Fail on missing keys (default: false = missing keys replaced with null)")
 
 // var buildVerbose = buildCmd.Bool("verbose", false, "Enable verbose output") - For later
 
@@ -23,7 +24,8 @@ func build() error {
 	logger.Info("building project",
 		"config", *buildConfigFile,
 		"input", *buildInputFile,
-		"output", *buildOutputFile)
+		"output", *buildOutputFile,
+		"strict", *buildStrict)
 
 	config, configErr := config.LoadConfig(*buildConfigFile)
 	if configErr != nil {
@@ -39,7 +41,7 @@ func build() error {
 
 	logger.Debug("input parsed successfully", "input_keys", len(input))
 
-	result, transformErr := transformer.Transform(input, config)
+	result, transformErr := transformer.Transform(input, config, *buildStrict)
 	if transformErr != nil {
 		return transformErr
 	}

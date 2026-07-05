@@ -5,12 +5,24 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/devsebastianops/watt-tf/internal/logger"
 	"github.com/google/cel-go/cel"
 )
 
 var interpRegex = regexp.MustCompile(`\${([^}]+)}`)
 
-func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[string]string) (any, error) {
+// isMissingKeyError checks if the error is about a missing key
+func isMissingKeyError(err error) bool {
+	if err == nil {
+		return false
+	}
+	errMsg := err.Error()
+	return strings.Contains(errMsg, "no such key") ||
+		strings.Contains(errMsg, "no such field") ||
+		strings.Contains(errMsg, "undefined reference")
+}
+
+func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[string]string, strict bool) (any, error) {
 	// Check the type of val and handle accordingly
 	switch v := val.(type) {
 
@@ -23,7 +35,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 
 		// There is only one match and the whole string is the interpolation, we can evaluate it directly
 		if len(matches) == 1 && matches[0][0] == v {
-			return evalCelExpression(matches[0][1], env, inputData, envVars)
+			return evalCelExpression(matches[0][1], env, inputData, envVars, strict)
 		}
 
 		// There are multiple matches or the interpolation is part of a larger string, we need to replace them
@@ -32,7 +44,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 			fullMatch := match[0]  // ${input.env}
 			expression := match[1] // input.env
 
-			celVal, err := evalCelExpression(expression, env, inputData, envVars)
+			celVal, err := evalCelExpression(expression, env, inputData, envVars, strict)
 			if err != nil {
 				return nil, err
 			}
@@ -58,7 +70,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 				continue
 			}
 
-			interpItem, err := interpolate(item, env, inputData, envVars)
+			interpItem, err := interpolate(item, env, inputData, envVars, strict)
 			if err != nil {
 				return nil, err
 			}
@@ -76,7 +88,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 				continue
 			}
 
-			interpItem, err := interpolate(item, env, inputData, envVars)
+			interpItem, err := interpolate(item, env, inputData, envVars, strict)
 			if err != nil {
 				return nil, err
 			}
@@ -89,7 +101,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 	}
 }
 
-func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string) (any, error) {
+func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string, strict bool) (any, error) {
 	ast, iss := env.Compile(expr)
 	if iss.Err() != nil {
 		return nil, fmt.Errorf("syntax error in interpolation '%s': %v", expr, iss.Err())
@@ -100,6 +112,15 @@ func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envV
 	}
 	out, _, err := program.Eval(map[string]any{"input": inputData, "env": envVars})
 	if err != nil {
+		// Handle missing key errors based on strict mode
+		if isMissingKeyError(err) {
+			if strict {
+				return nil, err
+			}
+			// In lenient mode, log warning and return nil
+			logger.Warn("missing key in CEL expression, using null", "expression", expr, "error", err.Error())
+			return nil, nil
+		}
 		return nil, err
 	}
 
@@ -122,7 +143,7 @@ func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envV
 }
 
 // interpolateWithItem is like interpolate but also includes item and item_index variables
-func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVars map[string]string, item any, itemIndex int) (any, error) {
+func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVars map[string]string, item any, itemIndex int, strict bool) (any, error) {
 	switch v := val.(type) {
 
 	case string:
@@ -132,7 +153,7 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 		}
 
 		if len(matches) == 1 && matches[0][0] == v {
-			return evalCelExpressionWithItem(matches[0][1], env, inputData, envVars, item, itemIndex)
+			return evalCelExpressionWithItem(matches[0][1], env, inputData, envVars, item, itemIndex, strict)
 		}
 
 		resultStr := v
@@ -140,7 +161,7 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 			fullMatch := match[0]
 			expression := match[1]
 
-			celVal, err := evalCelExpressionWithItem(expression, env, inputData, envVars, item, itemIndex)
+			celVal, err := evalCelExpressionWithItem(expression, env, inputData, envVars, item, itemIndex, strict)
 			if err != nil {
 				return nil, err
 			}
@@ -163,7 +184,7 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 				continue
 			}
 
-			interpItem, err := interpolateWithItem(mapItem, env, inputData, envVars, item, itemIndex)
+			interpItem, err := interpolateWithItem(mapItem, env, inputData, envVars, item, itemIndex, strict)
 			if err != nil {
 				return nil, err
 			}
@@ -179,7 +200,7 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 				continue
 			}
 
-			interpItem, err := interpolateWithItem(arrayItem, env, inputData, envVars, item, itemIndex)
+			interpItem, err := interpolateWithItem(arrayItem, env, inputData, envVars, item, itemIndex, strict)
 			if err != nil {
 				return nil, err
 			}
@@ -192,7 +213,7 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 	}
 }
 
-func evalCelExpressionWithItem(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string, item any, itemIndex int) (any, error) {
+func evalCelExpressionWithItem(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string, item any, itemIndex int, strict bool) (any, error) {
 	ast, iss := env.Compile(expr)
 	if iss.Err() != nil {
 		return nil, fmt.Errorf("syntax error in interpolation '%s': %v", expr, iss.Err())
@@ -208,6 +229,15 @@ func evalCelExpressionWithItem(expr string, env *cel.Env, inputData map[string]a
 		"item_index": itemIndex,
 	})
 	if err != nil {
+		// Handle missing key errors based on strict mode
+		if isMissingKeyError(err) {
+			if strict {
+				return nil, err
+			}
+			// In lenient mode, log warning and return nil
+			logger.Warn("missing key in CEL expression, using null", "expression", expr, "error", err.Error())
+			return nil, nil
+		}
 		return nil, err
 	}
 
