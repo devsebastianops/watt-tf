@@ -384,7 +384,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 - **GitHub**: [devsebastianops/watt-tf](https://github.com/devsebastianops/watt-tf)
 - **Issues**: [GitHub Issues](https://github.com/devsebastianops/watt-tf/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/devsebastianops/watt-tf/discussions)
 
 ---
 
