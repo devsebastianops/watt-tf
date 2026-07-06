@@ -1,0 +1,8 @@
+transform:
+  - target: output
+    value:
+      json_string: "${toJSON(input.data)}"
+      parsed_back: "${fromJSON(toJSON(input.data))}"
+      base64_encoded: "${toBase64(input.message)}"
+      base64_decoded: "${fromBase64(input.encoded)}"
+      json_as_base64: "${toBase64(toJSON(input.data))}"

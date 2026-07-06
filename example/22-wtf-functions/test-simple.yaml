@@ -1,0 +1,5 @@
+transform:
+  - target: output
+    value:
+      text: "${input.text.size()}"
+

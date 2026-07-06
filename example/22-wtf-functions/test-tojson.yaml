@@ -1,0 +1,4 @@
+transform:
+  - target: output
+    value:
+      result: "${toJSON(input.data)}"
