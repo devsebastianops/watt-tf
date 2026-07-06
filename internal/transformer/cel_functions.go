@@ -46,6 +46,40 @@ func fromBase64Impl(val ref.Val) ref.Val {
 	return types.String(string(decoded))
 }
 
+// isMapImpl checks if a value is a map
+func isMapImpl(val ref.Val) ref.Val {
+	_, ok := val.Value().(map[string]interface{})
+	return types.Bool(ok)
+}
+
+// isStringImpl checks if a value is a string
+func isStringImpl(val ref.Val) ref.Val {
+	_, ok := val.(types.String)
+	return types.Bool(ok)
+}
+
+// isArrayImpl checks if a value is an array/list
+func isArrayImpl(val ref.Val) ref.Val {
+	_, ok := val.Value().([]interface{})
+	return types.Bool(ok)
+}
+
+// isNumberImpl checks if a value is a number (int or float)
+func isNumberImpl(val ref.Val) ref.Val {
+	switch val.Value().(type) {
+	case float64, int, int32, int64, uint, uint32, uint64:
+		return types.Bool(true)
+	default:
+		return types.Bool(false)
+	}
+}
+
+// isBooleanImpl checks if a value is a boolean
+func isBooleanImpl(val ref.Val) ref.Val {
+	_, ok := val.(types.Bool)
+	return types.Bool(ok)
+}
+
 // RegisterWtfFunctions registers custom wtf helper functions in the CEL environment
 func RegisterWtfFunctions(env *cel.Env) (*cel.Env, error) {
 	var err error
@@ -99,6 +133,76 @@ func RegisterWtfFunctions(env *cel.Env) (*cel.Env, error) {
 				[]*cel.Type{cel.StringType},
 				cel.StringType,
 				cel.UnaryBinding(fromBase64Impl),
+			),
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Register isMap function
+	env, err = env.Extend(
+		cel.Function("isMap",
+			cel.Overload("isMap_any",
+				[]*cel.Type{cel.AnyType},
+				cel.BoolType,
+				cel.UnaryBinding(isMapImpl),
+			),
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Register isString function
+	env, err = env.Extend(
+		cel.Function("isString",
+			cel.Overload("isString_any",
+				[]*cel.Type{cel.AnyType},
+				cel.BoolType,
+				cel.UnaryBinding(isStringImpl),
+			),
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Register isArray function
+	env, err = env.Extend(
+		cel.Function("isArray",
+			cel.Overload("isArray_any",
+				[]*cel.Type{cel.AnyType},
+				cel.BoolType,
+				cel.UnaryBinding(isArrayImpl),
+			),
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Register isNumber function
+	env, err = env.Extend(
+		cel.Function("isNumber",
+			cel.Overload("isNumber_any",
+				[]*cel.Type{cel.AnyType},
+				cel.BoolType,
+				cel.UnaryBinding(isNumberImpl),
+			),
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Register isBoolean function
+	env, err = env.Extend(
+		cel.Function("isBoolean",
+			cel.Overload("isBoolean_any",
+				[]*cel.Type{cel.AnyType},
+				cel.BoolType,
+				cel.UnaryBinding(isBooleanImpl),
 			),
 		),
 	)

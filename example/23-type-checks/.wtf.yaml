@@ -1,0 +1,12 @@
+transform:
+  - target: output
+    value:
+      name_is_string: "${isString(input.name)}"
+      age_is_number: "${isNumber(input.age)}"
+      address_is_map: "${isMap(input.address)}"
+      tags_is_array: "${isArray(input.tags)}"
+      test_boolean: "${isBoolean(true)}"
+      name_value: "${input.name}"
+      age_value: "${input.age}"
+      tags_count: "${input.tags.size()}"
+      address_city: "${input.address.city}"
