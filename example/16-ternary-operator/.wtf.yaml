@@ -1,0 +1,17 @@
+transform:
+  - target: resource.server.default
+    value:
+      port: "${input.env == 'prod' ? 443 : 80}"
+      protocol: "${input.env == 'prod' ? 'https' : 'http'}"
+      ssl_enabled: "${input.env == 'prod' ? true : false}"
+  
+  - target: resource.config.logging
+    value:
+      level: "${input.debug_enabled ? 'DEBUG' : 'INFO'}"
+      output: "${input.debug_enabled ? 'stdout' : 'file'}"
+  
+  - target: resource.location
+    value:
+      region: "${input.region}"
+      environment: "${input.env}"
+      backup_region: "${input.region == 'us-west-2' ? 'us-east-1' : 'eu-central-1'}"
