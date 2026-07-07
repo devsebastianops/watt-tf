@@ -17,17 +17,20 @@ var buildInputFile = buildCmd.String("input", "", "Path to the input file")
 var buildOutputFile = buildCmd.String("output", "watt.tf.json", "Path to the output file")
 var buildStrict = buildCmd.Bool("strict", false, "Fail on missing keys (default: false = missing keys replaced with null)")
 var buildSchemaFile = buildCmd.String("schema", "", "Path to JSON Schema file for input validation (optional)")
-
-// var buildVerbose = buildCmd.Bool("verbose", false, "Enable verbose output") - For later
+var buildVerbose = buildCmd.Bool("verbose", false, "Enable verbose output")
 
 func build() error {
 	buildCmd.Parse(os.Args[2:])
-	logger.Info("building project",
+
+	logger.SetUp(*buildVerbose)
+
+	logger.Debug("building project",
 		"config", *buildConfigFile,
 		"input", *buildInputFile,
 		"output", *buildOutputFile,
 		"strict", *buildStrict,
-		"schema", *buildSchemaFile)
+		"schema", *buildSchemaFile,
+		"verbose", *buildVerbose)
 
 	config, configErr := config.LoadConfig(*buildConfigFile)
 	if configErr != nil {

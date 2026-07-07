@@ -19,6 +19,14 @@ func init() {
 	logger = slog.New(handler)
 }
 
+func SetUp(verbose bool) {
+	if verbose {
+		SetDebug()
+	} else {
+		SetLevel(slog.LevelInfo)
+	}
+}
+
 // Debug logs a debug-level message with optional attributes
 func Debug(msg string, args ...any) {
 	logger.Debug(msg, args...)
