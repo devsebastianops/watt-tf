@@ -14,8 +14,9 @@ type DispatchConfig struct {
 	Event       Event
 	Registry    *Registry
 	Input       map[string]interface{}
-	Environment map[string]interface{}
+	Environment map[string]string
 	BasePath    string
+	Result      map[string]interface{}
 }
 
 func DispatchEvents(config DispatchConfig) (Context, error) {
@@ -25,9 +26,10 @@ func DispatchEvents(config DispatchConfig) (Context, error) {
 	input := config.Input
 	environment := config.Environment
 	basePath := config.BasePath
+	result := config.Result
 
 	plugins := registry.GetPluginsForEvent(event)
-	context := newContext(input, environment)
+	context := newContext(input, environment, result)
 
 	logger.Debug("dispatching event", "event", event, "plugin_count", len(plugins))
 

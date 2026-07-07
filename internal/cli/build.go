@@ -3,6 +3,7 @@ package cli
 import (
 	"flag"
 	"os"
+	"strings"
 
 	"github.com/devsebastianops/watt-tf/internal/config"
 	"github.com/devsebastianops/watt-tf/internal/logger"
@@ -46,6 +47,8 @@ func build() error {
 		return inputErr
 	}
 
+	envVars := getEnvVars()
+
 	logger.Debug("input parsed successfully", "input_keys", len(input))
 
 	// Validate input against schema if provided
@@ -65,18 +68,34 @@ func build() error {
 		Event:       plugin.EventBeforeTransform,
 		Registry:    registry,
 		Input:       input,
-		Environment: nil,
+		Environment: envVars,
 		BasePath:    *buildConfigFile,
+		Result:      nil,
 	}
 	context, err := plugin.DispatchEvents(dispatchConfig)
 	if err != nil {
 		return err
 	}
 
-	result, transformErr := transformer.Transform(context.Input, config, *buildStrict)
+	result, transformErr := transformer.Transform(context.Input, envVars, config, *buildStrict)
 	if transformErr != nil {
 		return transformErr
 	}
+
+	dispatchConfigAfter := plugin.DispatchConfig{
+		Event:       plugin.EventAfterTransform,
+		Registry:    registry,
+		Input:       input,
+		Environment: envVars,
+		BasePath:    *buildConfigFile,
+		Result:      result,
+	}
+	contextAfter, err := plugin.DispatchEvents(dispatchConfigAfter)
+	if err != nil {
+		return err
+	}
+
+	result = contextAfter.Result
 
 	logger.Debug("transformation completed successfully")
 
@@ -86,4 +105,14 @@ func build() error {
 	}
 
 	return nil
+}
+
+// getEnvVars collects all environment variables into a map
+func getEnvVars() map[string]string {
+	envMap := make(map[string]string)
+	for _, envVar := range os.Environ() {
+		key, value, _ := strings.Cut(envVar, "=")
+		envMap[key] = value
+	}
+	return envMap
 }

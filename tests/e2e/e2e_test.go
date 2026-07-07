@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/devsebastianops/watt-tf/internal/config"
@@ -89,6 +90,8 @@ func runE2ETest(t *testing.T, examplePath string) {
 		t.Fatalf("failed to parse input: %v", err)
 	}
 
+	envVars := getEnvVars()
+
 	// 2. Load config
 	cfg, err := config.LoadConfig(configFile)
 	if err != nil {
@@ -102,8 +105,9 @@ func runE2ETest(t *testing.T, examplePath string) {
 		Event:       plugin.EventBeforeTransform,
 		Registry:    registry,
 		Input:       input,
-		Environment: nil,
-		BasePath:    examplePath,
+		Environment: envVars,
+		BasePath:    configFile,
+		Result:      nil,
 	}
 	context, err := plugin.DispatchEvents(dispatchConfig)
 	if err != nil {
@@ -111,10 +115,25 @@ func runE2ETest(t *testing.T, examplePath string) {
 	}
 
 	// 3. Transform
-	result, err := transformer.Transform(context.Input, cfg, false)
+	result, err := transformer.Transform(context.Input, envVars, cfg, false)
 	if err != nil {
 		t.Fatalf("transformation failed: %v", err)
 	}
+
+	dispatchConfigAfter := plugin.DispatchConfig{
+		Event:       plugin.EventAfterTransform,
+		Registry:    registry,
+		Input:       input,
+		Environment: envVars,
+		BasePath:    configFile,
+		Result:      result,
+	}
+	contextAfter, err := plugin.DispatchEvents(dispatchConfigAfter)
+	if err != nil {
+		t.Fatalf("failed to dispatch events: %v", err)
+	}
+
+	result = contextAfter.Result
 
 	// 4. Load expected output
 	expectedData, err := os.ReadFile(expectedFile)
@@ -199,4 +218,14 @@ func valuesEqual(a, b interface{}) bool {
 
 	// Compare primitives
 	return fmt.Sprintf("%v", a) == fmt.Sprintf("%v", b)
+}
+
+// getEnvVars collects all environment variables into a map
+func getEnvVars() map[string]string {
+	envMap := make(map[string]string)
+	for _, envVar := range os.Environ() {
+		key, value, _ := strings.Cut(envVar, "=")
+		envMap[key] = value
+	}
+	return envMap
 }

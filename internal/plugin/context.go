@@ -8,16 +8,15 @@ type Context struct {
 	Result map[string]interface{} `json:"result"`
 }
 
-func newContext(input map[string]interface{}, env map[string]interface{}) Context {
-	envStr := make(map[string]string)
-	for k, v := range env {
-		if strVal, ok := v.(string); ok {
-			envStr[k] = strVal
-		}
+func newContext(input map[string]interface{}, env map[string]string, result map[string]interface{}) Context {
+
+	if result == nil {
+		result = make(map[string]interface{})
 	}
+
 	return Context{
 		Input:  input,
-		Env:    envStr,
-		Result: make(map[string]interface{}),
+		Env:    env,
+		Result: result,
 	}
 }
