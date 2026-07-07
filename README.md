@@ -129,116 +129,7 @@ transform:
 }
 ```
 
-Please refer to the [examples](example/README.md) directory for more detailed use cases and configurations.
-
----
-
-## Configuration Guide
-
-### Basic Transform
-
-The `.wtf.yaml` file defines how to transform your input into Terraform configuration.
-
-```yaml
-transform:
-  - target: resource.aws_s3_bucket.my_bucket
-    value:
-      bucket: "my-bucket-name"
-      acl: "private"
-```
-
-### String Interpolation
-
-Use `${input.path.to.value}` to interpolate values from your input:
-
-```yaml
-transform:
-  - target: resource.aws_s3_bucket.${input.bucket_name}
-    value:
-      bucket: "${input.bucket_name}-${input.environment}"
-      tags:
-        Environment: "${input.environment}"
-        Owner: "${input.owner}"
-```
-
-### Conditional Transforms
-
-Use CEL expressions in the `if` field to conditionally apply transformations:
-
-```yaml
-transform:
-  - target: resource.aws_rds.production
-    if: input.environment == 'prod'
-    value:
-      instance_class: "db.r5.2xlarge"
-      multi_az: true
-  
-  - target: resource.aws_rds.development
-    if: input.environment == 'dev'
-    value:
-      instance_class: "db.t3.micro"
-      multi_az: false
-```
-
-### Complex Conditions
-
-CEL supports complex boolean logic:
-
-```yaml
-transform:
-  - target: resource.cache.redis
-    if: input.enable_cache && (input.env == 'production' || input.env == 'staging')
-    value:
-      size: "large"
-```
-
-### String Methods
-
-Use string methods for pattern matching:
-
-```yaml
-transform:
-  - target: resource.iam_role.admin
-    if: input.email.startsWith('admin@')
-    value:
-      permissions: ["admin"]
-  
-  - target: resource.cert.wildcard
-    if: input.domain.contains('*.example.com')
-    value:
-      wildcard: true
-```
-
-### Deep Merge
-
-Multiple transformations to the same target are automatically merged:
-
-```yaml
-transform:
-  - target: resource.aws_instance.server
-    value:
-      instance_type: "${input.instance_type}"
-  
-  - target: resource.aws_instance.server  # Same target!
-    value:
-      tags:
-        Name: "${input.server_name}"
-        Environment: "${input.environment}"
-```
-
-Result: Both `instance_type` and `tags` exist in the final output.
-
-### Nested Paths
-
-Deeply nested structures are automatically unflattened:
-
-```yaml
-transform:
-  - target: resource.aws_vpc.main.subnets.primary.tags
-    value:
-      Name: "${input.vpc_name}-primary"
-      Tier: "public"
-```
+Please refer to the [examples](example/README.md) for more detailed use cases and configurations, otherwise the [documentation](docs/README.md) provides comprehensive guidance.
 
 ---
 
@@ -255,6 +146,9 @@ Options:
   --input <FILE>      Input file (JSON or YAML) [required]
   --config <FILE>     Transformation config (.wtf.yaml) [default: .wtf.yaml]
   --output <FILE>     Output file [default: watt.tf.json]
+  --debug             Enable debug logging
+  --strict            Enable strict mode (fail on missing keys)
+  --schema <FILE>     JSON Schema file for input validation
 ```
 
 **Examples:**
@@ -267,6 +161,9 @@ wtf build --input input.yaml --output main.tf.json
 
 # Different config
 wtf build --input config.json --config transformations.yaml --output output.tf.json
+
+# Schema validation for input
+wtf build --input input.json --config .wtf.yaml --schema schema.json --output output.tf.json
 ```
 
 ---
@@ -286,45 +183,7 @@ go test ./tests/e2e -v -run "TestE2EExamples/01-simple-json"
 ls -la example/
 ```
 
-
-
----
-
-## Use Cases
-
-### Multi-Environment Deployments
-Generate environment-specific Terraform configurations from a single input:
-
-```yaml
-transform:
-  - target: resource.aws_instance.app
-    if: input.environment == 'prod'
-    value:
-      instance_type: "t3.large"
-      monitoring: true
-  
-  - target: resource.aws_instance.app
-    if: input.environment == 'dev'
-    value:
-      instance_type: "t3.micro"
-      monitoring: false
-```
-
-### Infrastructure Templating
-Reuse configuration templates across projects:
-
-```yaml
-transform:
-  - target: resource.aws_s3_bucket.${input.project}
-    value:
-      bucket: "${input.project}-${input.environment}-data"
-      versioning:
-        enabled: "${input.enable_versioning}"
-      tags:
-        Project: "${input.project}"
-        Environment: "${input.environment}"
-        CostCenter: "${input.cost_center}"
-```
+--- 
 
 ### CI/CD Integration
 Generate Terraform configurations dynamically in your pipeline:
@@ -361,15 +220,6 @@ Found a bug? [Open an Issue](https://github.com/devsebastianops/watt-tf/issues)
 3. Commit changes: `git commit -m 'Add amazing feature'`
 4. Push to branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
-
-
----
-
-## Roadmap
-
-- [ ] Plugin system for custom transformers
-- [ ] Interactive CLI mode
-- [ ] VS Code extension
 
 
 ---
