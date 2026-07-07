@@ -189,6 +189,9 @@ go test ./tests/e2e -v
 | Input Validation (JSON) | 18 |
 | Input Validation (YAML) | 19 |
 | Format-agnostic Validation | 19 |
+| Custom functions | 20 |
+| Type checking | 21 |
+| Plugins | 22, 23 |
 
 ---
 

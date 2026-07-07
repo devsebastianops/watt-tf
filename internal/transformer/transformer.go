@@ -2,7 +2,6 @@ package transformer
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/devsebastianops/watt-tf/internal/config"
@@ -10,11 +9,10 @@ import (
 	"github.com/google/cel-go/cel"
 )
 
-func Transform(input map[string]interface{}, config *config.Config, strict bool) (map[string]interface{}, error) {
+func Transform(input map[string]interface{}, envVars map[string]string, config *config.Config, strict bool) (map[string]interface{}, error) {
 
 	transformables := config.Transform
 	result := map[string]interface{}{}
-	envVars := getEnvVars()
 
 	if strict {
 		logger.Info("running in strict mode: missing keys will cause errors")
@@ -200,14 +198,4 @@ func unflatten(result map[string]any, path string, value any) {
 	}
 
 	current[lastPart] = value
-}
-
-// getEnvVars collects all environment variables into a map
-func getEnvVars() map[string]string {
-	envMap := make(map[string]string)
-	for _, envVar := range os.Environ() {
-		key, value, _ := strings.Cut(envVar, "=")
-		envMap[key] = value
-	}
-	return envMap
 }
