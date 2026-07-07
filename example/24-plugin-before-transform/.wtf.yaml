@@ -1,0 +1,13 @@
+plugins:
+- name: setValuePlugin
+  version: 1.0.0
+  on: beforeTransform
+  cmd: python
+  args:
+    - plugin.py
+
+transform:
+  - target: resource.config
+    value:
+      enabled: ${input.enabled}
+      value: ${input.value}

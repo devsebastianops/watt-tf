@@ -7,6 +7,7 @@ import (
 	"github.com/devsebastianops/watt-tf/internal/config"
 	"github.com/devsebastianops/watt-tf/internal/logger"
 	"github.com/devsebastianops/watt-tf/internal/parser"
+	"github.com/devsebastianops/watt-tf/internal/plugin"
 	"github.com/devsebastianops/watt-tf/internal/transformer"
 	"github.com/devsebastianops/watt-tf/internal/writer"
 )
@@ -38,6 +39,7 @@ func build() error {
 	}
 
 	logger.Debug("configuration loaded", "transform_count", len(config.Transform))
+	logger.Debug("Plugins", "plugins", config.Plugins)
 
 	input, inputErr := parser.ParseInput(*buildInputFile)
 	if inputErr != nil {
@@ -56,7 +58,22 @@ func build() error {
 		logger.Debug("input validation passed")
 	}
 
-	result, transformErr := transformer.Transform(input, config, *buildStrict)
+	registry := plugin.NewRegistry()
+	registry.RegisterPlugins(config.Plugins)
+
+	dispatchConfig := plugin.DispatchConfig{
+		Event:       plugin.EventBeforeTransform,
+		Registry:    registry,
+		Input:       input,
+		Environment: nil,
+		BasePath:    *buildConfigFile,
+	}
+	context, err := plugin.DispatchEvents(dispatchConfig)
+	if err != nil {
+		return err
+	}
+
+	result, transformErr := transformer.Transform(context.Input, config, *buildStrict)
 	if transformErr != nil {
 		return transformErr
 	}

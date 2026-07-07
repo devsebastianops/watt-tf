@@ -1,6 +1,9 @@
 package config
 
+import "github.com/devsebastianops/watt-tf/internal/plugin"
+
 type Config struct {
+	Plugins   []plugin.Plugin `yaml:"plugins,omitempty"`
 	Include   []string        `yaml:"include,omitempty"`
 	Transform []Transformable `yaml:"transform"`
 }

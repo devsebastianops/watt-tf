@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/devsebastianops/watt-tf/internal/parser"
+	p "github.com/devsebastianops/watt-tf/internal/plugin"
 )
 
 func LoadConfig(filePath string) (*Config, error) {
@@ -38,6 +39,8 @@ func LoadConfig(filePath string) (*Config, error) {
 
 				// Append transforms from included config
 				config.Transform = append(config.Transform, includedConfig.Transform...)
+				// Append plugins from included config
+				config.Plugins = append(config.Plugins, includedConfig.Plugins...)
 			}
 		}
 	}
@@ -50,6 +53,8 @@ func LoadConfig(filePath string) (*Config, error) {
 
 	// Append main config transforms
 	config.Transform = append(config.Transform, mainConfig.Transform...)
+	// Append main config plugins
+	config.Plugins = append(config.Plugins, mainConfig.Plugins...)
 
 	return config, nil
 }
@@ -63,6 +68,7 @@ func loadConfigWithoutIncludes(filePath string) (*Config, error) {
 
 	config := &Config{
 		Transform: []Transformable{},
+		Plugins:   []p.Plugin{},
 	}
 
 	// Parse transforms
@@ -106,6 +112,55 @@ func loadConfigWithoutIncludes(filePath string) (*Config, error) {
 			Value:   value,
 			ForEach: forEach,
 		})
+	}
+
+	// Parse plugins
+	pluginList, ok := configMap["plugins"].([]interface{})
+	if ok {
+		for _, plugin := range pluginList {
+			pluginMap, ok := plugin.(map[string]interface{})
+			if !ok {
+				return nil, fmt.Errorf("invalid plugin entry")
+			}
+
+			name, ok := pluginMap["name"].(string)
+			if !ok {
+				return nil, fmt.Errorf("missing or invalid 'name' field in plugin")
+			}
+
+			cmd, ok := pluginMap["cmd"].(string)
+			if !ok {
+				return nil, fmt.Errorf("missing or invalid 'cmd' field in plugin '%s'", name)
+			}
+
+			on, ok := pluginMap["on"].(string)
+			if !ok {
+				return nil, fmt.Errorf("missing or invalid 'on' field in plugin '%s'", name)
+			}
+
+			version, ok := pluginMap["version"].(string)
+			if !ok {
+				return nil, fmt.Errorf("missing or invalid 'version' field in plugin '%s'", name)
+			}
+
+			argsInterface, _ := pluginMap["args"].([]interface{})
+			args := []string{}
+			for _, arg := range argsInterface {
+				if argStr, ok := arg.(string); ok {
+					args = append(args, argStr)
+				} else {
+					return nil, fmt.Errorf("invalid argument in 'args' for plugin '%s'", name)
+				}
+			}
+
+			config.Plugins = append(config.Plugins, p.Plugin{
+				Name:    name,
+				Version: version,
+				On:      on,
+				Cmd:     cmd,
+				Args:    args,
+			})
+		}
 	}
 
 	return config, nil

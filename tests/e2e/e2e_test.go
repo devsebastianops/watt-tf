@@ -9,6 +9,7 @@ import (
 
 	"github.com/devsebastianops/watt-tf/internal/config"
 	"github.com/devsebastianops/watt-tf/internal/parser"
+	"github.com/devsebastianops/watt-tf/internal/plugin"
 	"github.com/devsebastianops/watt-tf/internal/transformer"
 )
 
@@ -94,8 +95,23 @@ func runE2ETest(t *testing.T, examplePath string) {
 		t.Fatalf("failed to load config: %v", err)
 	}
 
+	registry := plugin.NewRegistry()
+	registry.RegisterPlugins(cfg.Plugins)
+
+	dispatchConfig := plugin.DispatchConfig{
+		Event:       plugin.EventBeforeTransform,
+		Registry:    registry,
+		Input:       input,
+		Environment: nil,
+		BasePath:    examplePath,
+	}
+	context, err := plugin.DispatchEvents(dispatchConfig)
+	if err != nil {
+		t.Fatalf("failed to dispatch events: %v", err)
+	}
+
 	// 3. Transform
-	result, err := transformer.Transform(input, cfg, false)
+	result, err := transformer.Transform(context.Input, cfg, false)
 	if err != nil {
 		t.Fatalf("transformation failed: %v", err)
 	}
