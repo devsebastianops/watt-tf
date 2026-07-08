@@ -1,38 +1,23 @@
 package cli
 
 import (
-	"errors"
-	"fmt"
+	"github.com/spf13/cobra"
 )
 
-func Wtf() error {
-	subcommand, err := getSubcommand()
-	if err != nil {
-		return err
-	}
-
-	switch subcommand {
-	case "build":
-		return build()
-	case "help":
-		help()
-		return nil
-	default:
-		return errors.New("unknown subcommand: " + subcommand)
-	}
+var rootCmd = &cobra.Command{
+	Use:   "wtf",
+	Short: "Watt Terraform (wtf) is a tool to generate Terraform configurations from structured input.",
+	Long: `Watt Terraform (wtf) is a command-line tool that allows you to generate Terraform configurations
+from structured input files. It supports various plugins and transformations to customize the output.`,
 }
 
-func help() {
-	fmt.Println("Usage: wtf <command> [options]")
-	fmt.Println()
-	fmt.Println("Commands:")
-	fmt.Println("  build    Build the project")
-	fmt.Println("  help     Show this help message")
-	fmt.Println()
-	fmt.Println("Build Options:")
-	fmt.Println("  --config <file>   Path to the configuration file (default: .wtf.yaml)")
-	fmt.Println("  --input <file>    Path to the input file (required)")
-	fmt.Println("  --output <file>   Path to the output file (default: watt.tf.json)")
-	fmt.Println("  --strict          Fail on missing keys (default: false = missing keys → null)")
-	fmt.Println("  --schema <file>   Path to JSON Schema for input validation (optional)")
+func Execute() error {
+	return rootCmd.Execute()
+}
+
+func init() {
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose output")
+
+	rootCmd.AddCommand(buildCmd)
+	rootCmd.AddCommand(pluginCmd)
 }

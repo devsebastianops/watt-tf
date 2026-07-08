@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"flag"
 	"os"
 	"strings"
 
@@ -11,30 +10,47 @@ import (
 	"github.com/devsebastianops/watt-tf/internal/plugin"
 	"github.com/devsebastianops/watt-tf/internal/transformer"
 	"github.com/devsebastianops/watt-tf/internal/writer"
+	"github.com/spf13/cobra"
 )
 
-var buildCmd = flag.NewFlagSet("build", flag.ExitOnError)
-var buildConfigFile = buildCmd.String("config", ".wtf.yaml", "Path to the configuration file")
-var buildInputFile = buildCmd.String("input", "", "Path to the input file")
-var buildOutputFile = buildCmd.String("output", "watt.tf.json", "Path to the output file")
-var buildStrict = buildCmd.Bool("strict", false, "Fail on missing keys (default: false = missing keys replaced with null)")
-var buildSchemaFile = buildCmd.String("schema", "", "Path to JSON Schema file for input validation (optional)")
-var buildVerbose = buildCmd.Bool("verbose", false, "Enable verbose output")
+var buildCmd = &cobra.Command{
+	Use:   "build",
+	Short: "Build the project",
+	Long:  `Build the project using the specified configuration file.`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return buildHandler()
+	},
+}
 
-func build() error {
-	buildCmd.Parse(os.Args[2:])
+var (
+	buildConfigFile string
+	buildInputFile  string
+	buildOutputFile string
+	buildStrict     bool
+	buildSchemaFile string
+	buildVerbose    bool
+)
 
-	logger.SetUp(*buildVerbose)
+func init() {
+	buildCmd.Flags().StringVarP(&buildConfigFile, "config", "c", ".wtf.yaml", "Path to the configuration file")
+	buildCmd.Flags().StringVarP(&buildInputFile, "input", "i", "", "Path to the input file")
+	buildCmd.Flags().StringVarP(&buildOutputFile, "output", "o", "watt.tf.json", "Path to the output file")
+	buildCmd.Flags().BoolVarP(&buildStrict, "strict", "s", false, "Fail on missing keys (default: false = missing keys replaced with null)")
+	buildCmd.Flags().StringVarP(&buildSchemaFile, "schema", "S", "", "Path to JSON Schema file for input validation (optional)")
+	buildCmd.Flags().BoolVarP(&buildVerbose, "verbose", "v", false, "Enable verbose output")
+}
 
+func buildHandler() error {
+	logger.SetUp(buildVerbose)
 	logger.Debug("building project",
-		"config", *buildConfigFile,
-		"input", *buildInputFile,
-		"output", *buildOutputFile,
-		"strict", *buildStrict,
-		"schema", *buildSchemaFile,
-		"verbose", *buildVerbose)
+		"config", buildConfigFile,
+		"input", buildInputFile,
+		"output", buildOutputFile,
+		"strict", buildStrict,
+		"schema", buildSchemaFile,
+		"verbose", buildVerbose)
 
-	config, configErr := config.LoadConfig(*buildConfigFile)
+	config, configErr := config.LoadConfig(buildConfigFile)
 	if configErr != nil {
 		return configErr
 	}
@@ -42,7 +58,7 @@ func build() error {
 	logger.Debug("configuration loaded", "transform_count", len(config.Transform))
 	logger.Debug("Plugins", "plugins", config.Plugins)
 
-	input, inputErr := parser.ParseInput(*buildInputFile)
+	input, inputErr := parser.ParseInput(buildInputFile)
 	if inputErr != nil {
 		return inputErr
 	}
@@ -52,9 +68,9 @@ func build() error {
 	logger.Debug("input parsed successfully", "input_keys", len(input))
 
 	// Validate input against schema if provided
-	if *buildSchemaFile != "" {
-		logger.Info("validating input against schema", "schema", *buildSchemaFile)
-		validationErr := validateInputSchema(input, *buildSchemaFile)
+	if buildSchemaFile != "" {
+		logger.Info("validating input against schema", "schema", buildSchemaFile)
+		validationErr := validateInputSchema(input, buildSchemaFile)
 		if validationErr != nil {
 			return validationErr
 		}
@@ -69,7 +85,7 @@ func build() error {
 		Registry:    registry,
 		Input:       input,
 		Environment: envVars,
-		BasePath:    *buildConfigFile,
+		BasePath:    buildConfigFile,
 		Result:      nil,
 	}
 	context, err := plugin.DispatchEvents(dispatchConfig)
@@ -77,7 +93,7 @@ func build() error {
 		return err
 	}
 
-	result, transformErr := transformer.Transform(context.Input, envVars, config, *buildStrict)
+	result, transformErr := transformer.Transform(context.Input, envVars, config, buildStrict)
 	if transformErr != nil {
 		return transformErr
 	}
@@ -87,7 +103,7 @@ func build() error {
 		Registry:    registry,
 		Input:       input,
 		Environment: envVars,
-		BasePath:    *buildConfigFile,
+		BasePath:    buildConfigFile,
 		Result:      result,
 	}
 	contextAfter, err := plugin.DispatchEvents(dispatchConfigAfter)
@@ -99,7 +115,7 @@ func build() error {
 
 	logger.Debug("transformation completed successfully")
 
-	writeErr := writer.WriteJSON(result, *buildOutputFile)
+	writeErr := writer.WriteJSON(result, buildOutputFile)
 	if writeErr != nil {
 		return writeErr
 	}
@@ -107,7 +123,6 @@ func build() error {
 	return nil
 }
 
-// getEnvVars collects all environment variables into a map
 func getEnvVars() map[string]string {
 	envMap := make(map[string]string)
 	for _, envVar := range os.Environ() {

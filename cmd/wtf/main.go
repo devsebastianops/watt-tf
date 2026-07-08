@@ -8,9 +8,8 @@ import (
 )
 
 func main() {
-	err := cli.Wtf()
+	err := cli.Execute()
 	if err != nil {
-
 		logger.Error("wtf command failed", "error", err.Error())
 		os.Exit(1)
 	}
