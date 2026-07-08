@@ -1,4 +1,4 @@
-package cli
+package validator
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"github.com/xeipuuv/gojsonschema"
 )
 
-func validateInputSchema(input map[string]any, schemaFile string) error {
+func ValidateInputSchema(input map[string]any, schemaFile string) error {
 	// Read schema file
 	schemaData, err := os.ReadFile(schemaFile)
 	if err != nil {

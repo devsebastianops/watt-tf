@@ -1,14 +1,13 @@
 package cli
 
 import (
-	"os"
-	"strings"
-
 	"github.com/devsebastianops/watt-tf/internal/config"
+	"github.com/devsebastianops/watt-tf/internal/environment"
 	"github.com/devsebastianops/watt-tf/internal/logger"
 	"github.com/devsebastianops/watt-tf/internal/parser"
 	"github.com/devsebastianops/watt-tf/internal/plugin"
 	"github.com/devsebastianops/watt-tf/internal/transformer"
+	"github.com/devsebastianops/watt-tf/internal/validator"
 	"github.com/devsebastianops/watt-tf/internal/writer"
 	"github.com/spf13/cobra"
 )
@@ -22,35 +21,37 @@ var buildCmd = &cobra.Command{
 	},
 }
 
-var (
-	buildConfigFile string
-	buildInputFile  string
-	buildOutputFile string
-	buildStrict     bool
-	buildSchemaFile string
-	buildVerbose    bool
-)
+type BuildOptions struct {
+	ConfigFile string
+	InputFile  string
+	OutputFile string
+	Strict     bool
+	SchemaFile string
+	Verbose    bool
+}
+
+var buildOptions = BuildOptions{}
 
 func init() {
-	buildCmd.Flags().StringVarP(&buildConfigFile, "config", "c", ".wtf.yaml", "Path to the configuration file")
-	buildCmd.Flags().StringVarP(&buildInputFile, "input", "i", "", "Path to the input file")
-	buildCmd.Flags().StringVarP(&buildOutputFile, "output", "o", "watt.tf.json", "Path to the output file")
-	buildCmd.Flags().BoolVarP(&buildStrict, "strict", "s", false, "Fail on missing keys (default: false = missing keys replaced with null)")
-	buildCmd.Flags().StringVarP(&buildSchemaFile, "schema", "S", "", "Path to JSON Schema file for input validation (optional)")
-	buildCmd.Flags().BoolVarP(&buildVerbose, "verbose", "v", false, "Enable verbose output")
+	buildCmd.Flags().StringVarP(&buildOptions.ConfigFile, "config", "c", ".wtf.yaml", "Path to the configuration file")
+	buildCmd.Flags().StringVarP(&buildOptions.InputFile, "input", "i", "", "Path to the input file")
+	buildCmd.Flags().StringVarP(&buildOptions.OutputFile, "output", "o", "watt.tf.json", "Path to the output file")
+	buildCmd.Flags().BoolVarP(&buildOptions.Strict, "strict", "s", false, "Fail on missing keys (default: false = missing keys replaced with null)")
+	buildCmd.Flags().StringVarP(&buildOptions.SchemaFile, "schema", "S", "", "Path to JSON Schema file for input validation (optional)")
+	buildCmd.Flags().BoolVarP(&buildOptions.Verbose, "verbose", "v", false, "Enable verbose output")
 }
 
 func buildHandler() error {
-	logger.SetUp(buildVerbose)
+	logger.SetUp(buildOptions.Verbose)
 	logger.Debug("building project",
-		"config", buildConfigFile,
-		"input", buildInputFile,
-		"output", buildOutputFile,
-		"strict", buildStrict,
-		"schema", buildSchemaFile,
-		"verbose", buildVerbose)
+		"config", buildOptions.ConfigFile,
+		"input", buildOptions.InputFile,
+		"output", buildOptions.OutputFile,
+		"strict", buildOptions.Strict,
+		"schema", buildOptions.SchemaFile,
+		"verbose", buildOptions.Verbose)
 
-	config, configErr := config.LoadConfig(buildConfigFile)
+	config, configErr := config.LoadConfig(buildOptions.ConfigFile)
 	if configErr != nil {
 		return configErr
 	}
@@ -58,19 +59,19 @@ func buildHandler() error {
 	logger.Debug("configuration loaded", "transform_count", len(config.Transform))
 	logger.Debug("Plugins", "plugins", config.Plugins)
 
-	input, inputErr := parser.ParseInput(buildInputFile)
+	input, inputErr := parser.ParseInput(buildOptions.InputFile)
 	if inputErr != nil {
 		return inputErr
 	}
 
-	envVars := getEnvVars()
+	envVars := environment.GetEnvVars()
 
 	logger.Debug("input parsed successfully", "input_keys", len(input))
 
 	// Validate input against schema if provided
-	if buildSchemaFile != "" {
-		logger.Info("validating input against schema", "schema", buildSchemaFile)
-		validationErr := validateInputSchema(input, buildSchemaFile)
+	if buildOptions.SchemaFile != "" {
+		logger.Info("validating input against schema", "schema", buildOptions.SchemaFile)
+		validationErr := validator.ValidateInputSchema(input, buildOptions.SchemaFile)
 		if validationErr != nil {
 			return validationErr
 		}
@@ -85,7 +86,7 @@ func buildHandler() error {
 		Registry:    registry,
 		Input:       input,
 		Environment: envVars,
-		BasePath:    buildConfigFile,
+		BasePath:    buildOptions.ConfigFile,
 		Result:      nil,
 	}
 	context, err := plugin.DispatchEvents(dispatchConfig)
@@ -93,7 +94,7 @@ func buildHandler() error {
 		return err
 	}
 
-	result, transformErr := transformer.Transform(context.Input, envVars, config, buildStrict)
+	result, transformErr := transformer.Transform(context.Input, envVars, config, buildOptions.Strict)
 	if transformErr != nil {
 		return transformErr
 	}
@@ -103,7 +104,7 @@ func buildHandler() error {
 		Registry:    registry,
 		Input:       input,
 		Environment: envVars,
-		BasePath:    buildConfigFile,
+		BasePath:    buildOptions.ConfigFile,
 		Result:      result,
 	}
 	contextAfter, err := plugin.DispatchEvents(dispatchConfigAfter)
@@ -115,19 +116,10 @@ func buildHandler() error {
 
 	logger.Debug("transformation completed successfully")
 
-	writeErr := writer.WriteJSON(result, buildOutputFile)
+	writeErr := writer.WriteJSON(result, buildOptions.OutputFile)
 	if writeErr != nil {
 		return writeErr
 	}
 
 	return nil
-}
-
-func getEnvVars() map[string]string {
-	envMap := make(map[string]string)
-	for _, envVar := range os.Environ() {
-		key, value, _ := strings.Cut(envVar, "=")
-		envMap[key] = value
-	}
-	return envMap
 }
