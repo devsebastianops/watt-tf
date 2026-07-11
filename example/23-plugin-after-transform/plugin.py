@@ -9,26 +9,24 @@ def handle(version, event, data):
     return data
 
 def main():
-    for line in sys.stdin:
-        if not line.strip():
-            continue
+    line = sys.stdin.readline()
 
-        try:
-            req = json.loads(line)
-            version = req.get("version", "")
-            data = req.get("data", {})
-            event = req.get("event", "")
+    try:
+        req = json.loads(line)
+        version = req.get("version", "")
+        data = req.get("data", {})
+        event = req.get("event", "")
 
-            if event == "afterTransform":
-                updatedData = handle(version, event, data)
+        if event == "afterTransform":
+            updatedData = handle(version, event, data)
 
-            response = {"status": "success", "data": updatedData}
-        except Exception as e:
-            response = {"status": "error", "error": str(e)}
+        response = {"status": "success", "data": updatedData}
+    except Exception as e:
+        response = {"status": "error", "error": str(e)}
 
-        sys.stdout.write(json.dumps(response) + "\n")
-        sys.stdout.flush()  # Verhindert, dass Go blockiert
-        os._exit(0)  # Beendet das Plugin nach der Verarbeitung
+    sys.stdout.write(json.dumps(response) + "\n")
+    sys.stdout.flush()
+    os._exit(0)
 
 
 if __name__ == "__main__":
