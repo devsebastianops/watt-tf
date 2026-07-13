@@ -26,6 +26,7 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 		cel.Variable("item", cel.AnyType),
 		cel.Variable("item_index", cel.IntType),
 		cel.Macros(cel.StandardMacros...),
+		cel.OptionalTypes(),
 	)
 
 	// Register custom wtf functions

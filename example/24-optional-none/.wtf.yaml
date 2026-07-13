@@ -1,0 +1,6 @@
+transform:
+- target: resource.example.optional_none
+  value:
+    name: "${input.name}"
+    ssl-certificate: >-
+      ${has(input.ssl_certificate) ? optional.of(input.ssl_certificate) : optional.none()}
