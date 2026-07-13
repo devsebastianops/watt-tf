@@ -20,6 +20,7 @@ var buildOutputFile = buildCmd.String("output", "watt.tf.json", "Path to the out
 var buildStrict = buildCmd.Bool("strict", false, "Fail on missing keys (default: false = missing keys replaced with null)")
 var buildSchemaFile = buildCmd.String("schema", "", "Path to JSON Schema file for input validation (optional)")
 var buildVerbose = buildCmd.Bool("verbose", false, "Enable verbose output")
+var buildStripNulls = buildCmd.Bool("strip-nulls", false, "Strip null values from the output (default: false)")
 
 func build() error {
 	buildCmd.Parse(os.Args[2:])
@@ -96,6 +97,10 @@ func build() error {
 	}
 
 	result = contextAfter.Result
+
+	if *buildStripNulls {
+		result = transformer.StripNullValues(result)
+	}
 
 	logger.Debug("transformation completed successfully")
 
