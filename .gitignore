@@ -113,6 +113,10 @@ watt.tf.json
 output.tf.json
 *.tf.json
 
+# Do not ignore exprected.tf.json for testing purposes
+!example/**/expected.tf.json
+
+
 # Logs
 *.log
 logs/

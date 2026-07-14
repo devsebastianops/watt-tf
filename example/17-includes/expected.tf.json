@@ -1,0 +1,15 @@
+{
+  "resource": {
+    "compute": {
+      "default": {
+        "port": 5432
+      }
+    },
+    "google_cloud_run_service": {
+      "default": {
+        "image": "my-app:latest",
+        "port": 8080
+      }
+    }
+  }
+}

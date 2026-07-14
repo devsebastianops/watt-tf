@@ -1,0 +1,21 @@
+{
+  "resource": {
+    "job": {
+      "my-job": {
+        "enabled": true,
+        "id": "job-1",
+        "name": "my-job"
+      },
+      "another-job": {
+        "enabled": true,
+        "id": "job-2",
+        "name": "another-job"
+      },
+      "third-job": {
+        "enabled": true,
+        "id": "job-3",
+        "name": "third-job"
+      }
+    }
+  }
+}

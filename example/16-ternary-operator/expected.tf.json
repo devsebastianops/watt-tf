@@ -1,0 +1,22 @@
+{
+  "resource": {
+    "config": {
+      "logging": {
+        "level": "DEBUG",
+        "output": "stdout"
+      }
+    },
+    "location": {
+      "backup_region": "us-east-1",
+      "environment": "prod",
+      "region": "us-west-2"
+    },
+    "server": {
+      "default": {
+        "port": 443,
+        "protocol": "https",
+        "ssl_enabled": true
+      }
+    }
+  }
+}

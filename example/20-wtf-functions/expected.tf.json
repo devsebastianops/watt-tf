@@ -1,0 +1,16 @@
+{
+  "output": {
+    "base64_decoded": "Hello Base64",
+    "base64_encoded": "SGVsbG8gV29ybGQ=",
+    "json_as_base64": "eyJrZXkiOiJ2YWx1ZSIsIm5lc3RlZCI6WzEsMiwzXX0=",
+    "json_string": "{\"key\":\"value\",\"nested\":[1,2,3]}",
+    "parsed_back": {
+      "key": "value",
+      "nested": [
+        1,
+        2,
+        3
+      ]
+    }
+  }
+}

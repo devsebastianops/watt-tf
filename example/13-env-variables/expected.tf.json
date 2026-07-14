@@ -1,0 +1,13 @@
+{
+  "resource": {
+    "compute_instance": {
+      "config": {
+        "cpu_cores": 4,
+        "environment": "production",
+        "memory_gb": 8,
+        "name": "api-gateway",
+        "region": "us-east-1"
+      }
+    }
+  }
+}

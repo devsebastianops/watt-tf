@@ -1,0 +1,10 @@
+{
+    "resource": {
+        "example": {
+            "optional_none": {
+                "name": "example-24-optional-none",
+                "ssl-certificate": null
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+{
+  "resource": {
+    "config": {
+      "enabled": true,
+      "tags": [1, 2, 3]
+    }
+  }
+}

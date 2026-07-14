@@ -1,0 +1,13 @@
+{
+  "output": {
+    "address_city": "New York",
+    "address_is_map": true,
+    "age_is_number": true,
+    "age_value": 30,
+    "name_is_string": true,
+    "name_value": "John",
+    "tags_count": 2,
+    "tags_is_array": true,
+    "test_boolean": true
+  }
+}

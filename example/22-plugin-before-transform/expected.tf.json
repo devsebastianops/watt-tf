@@ -1,0 +1,8 @@
+{
+  "resource": {
+    "config": {
+      "enabled": true,
+      "value": "This field was added by the beforeTransform plugin."
+    }
+  }
+}

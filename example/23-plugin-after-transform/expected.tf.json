@@ -1,0 +1,10 @@
+{
+  "resource": {
+    "config": {
+      "enabled": true
+    },
+    "additional": {
+      "value": "set by plugin"
+    }
+  }
+}

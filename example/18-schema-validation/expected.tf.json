@@ -1,0 +1,15 @@
+{
+  "resource": {
+    "compute_instance": {
+      "server": {
+        "enabled": true,
+        "name": "prod-server",
+        "port": 8080,
+        "tags": [
+          "production",
+          "critical"
+        ]
+      }
+    }
+  }
+}
