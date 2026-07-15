@@ -92,6 +92,9 @@ go build -o wtf ./cmd/wtf/main.go
 docker run --rm -v "$(pwd):/app" -w /app devsebastianops/watt-tf --help
 ```
 
+### From pre-built binaries
+You can download the latest release from the [GitHub releases page](https://github.com/devsebastianops/watt-tf/releases).
+
 ---
 
 ## Quick Start
