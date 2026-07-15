@@ -37,11 +37,13 @@ These goals often conflict.
 
 Infrastructure teams want to expose a small, opinionated interface:
 
+```json
 {
   "service": "orders",
   "image": "ghcr.io/company/orders:v1",
   "database": true
 }
+```
 
 Instead, developers end up interacting directly with complex Terraform modules containing dozens of variables, many of which should remain implementation details.
 
@@ -74,6 +76,7 @@ Watt TF takes care of how it's built.
 ### Via Go
 ```bash
 go install github.com/devsebastianops/watt-tf/cmd/wtf@latest
+wtf --help
 ```
 
 ### From Source
@@ -82,6 +85,11 @@ git clone https://github.com/devsebastianops/watt-tf.git
 cd watt-tf
 go build -o wtf ./cmd/wtf/main.go
 ./wtf --help
+```
+
+### Docker
+```bash
+docker run --rm -v "$(pwd):/app" -w /app devsebastianops/watt-tf --help
 ```
 
 ---
