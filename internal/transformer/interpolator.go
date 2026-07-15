@@ -2,14 +2,11 @@ package transformer
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/devsebastianops/watt-tf/internal/logger"
 	"github.com/google/cel-go/cel"
 )
-
-var interpRegex = regexp.MustCompile(`\${([^}]+)}`)
 
 // isMissingKeyError checks if the error is about a missing key
 func isMissingKeyError(err error) bool {
@@ -28,21 +25,22 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 
 	case string:
 		// Is it a string?
-		matches := interpRegex.FindAllStringSubmatch(v, -1)
-		if len(matches) == 0 {
+		hasInterpolation := hasInterpolation(v)
+		if !hasInterpolation {
 			return v, nil // Just a regular string, return as is
 		}
+		matches := findInterpolations(v)
 
 		// There is only one match and the whole string is the interpolation, we can evaluate it directly
-		if len(matches) == 1 && matches[0][0] == v {
-			return evalCelExpression(matches[0][1], env, inputData, envVars, strict)
+		if len(matches) == 1 && matches[0].Start == 0 && matches[0].End == len(v) {
+			return evalCelExpression(matches[0].Expr, env, inputData, envVars, strict)
 		}
 
 		// There are multiple matches or the interpolation is part of a larger string, we need to replace them
 		resultStr := v
 		for _, match := range matches {
-			fullMatch := match[0]  // ${input.env}
-			expression := match[1] // input.env
+			fullMatch := v[match.Start:match.End] // ${input.env}
+			expression := match.Expr              // input.env
 
 			celVal, err := evalCelExpression(expression, env, inputData, envVars, strict)
 			if err != nil {
@@ -147,19 +145,20 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 	switch v := val.(type) {
 
 	case string:
-		matches := interpRegex.FindAllStringSubmatch(v, -1)
-		if len(matches) == 0 {
+		hasInterpolation := hasInterpolation(v)
+		if !hasInterpolation {
 			return v, nil
 		}
 
-		if len(matches) == 1 && matches[0][0] == v {
-			return evalCelExpressionWithItem(matches[0][1], env, inputData, envVars, item, itemIndex, strict)
+		matches := findInterpolations(v)
+		if len(matches) == 1 && matches[0].Start == 0 && matches[0].End == len(v) {
+			return evalCelExpressionWithItem(matches[0].Expr, env, inputData, envVars, item, itemIndex, strict)
 		}
 
 		resultStr := v
 		for _, match := range matches {
-			fullMatch := match[0]
-			expression := match[1]
+			fullMatch := v[match.Start:match.End]
+			expression := match.Expr
 
 			celVal, err := evalCelExpressionWithItem(expression, env, inputData, envVars, item, itemIndex, strict)
 			if err != nil {
