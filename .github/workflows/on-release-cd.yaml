@@ -1,4 +1,4 @@
-name: Release Docker
+name: On Releas Continuous Delivery
 
 on:
   release:
