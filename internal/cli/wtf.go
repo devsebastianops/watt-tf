@@ -1,38 +1,27 @@
 package cli
 
 import (
-	"errors"
-	"fmt"
+	"github.com/spf13/cobra"
 )
 
-func Wtf() error {
-	subcommand, err := getSubcommand()
-	if err != nil {
-		return err
-	}
-
-	switch subcommand {
-	case "build":
-		return build()
-	case "help":
-		help()
-		return nil
-	default:
-		return errors.New("unknown subcommand: " + subcommand)
-	}
+var PersistentFlags struct {
+	Verbose bool
 }
 
-func help() {
-	fmt.Println("Usage: wtf <command> [options]")
-	fmt.Println()
-	fmt.Println("Commands:")
-	fmt.Println("  build    Build the project")
-	fmt.Println("  help     Show this help message")
-	fmt.Println()
-	fmt.Println("Build Options:")
-	fmt.Println("  --config <file>   Path to the configuration file (default: .wtf.yaml)")
-	fmt.Println("  --input <file>    Path to the input file (required)")
-	fmt.Println("  --output <file>   Path to the output file (default: watt.tf.json)")
-	fmt.Println("  --strict          Fail on missing keys (default: false = missing keys → null)")
-	fmt.Println("  --schema <file>   Path to JSON Schema for input validation (optional)")
+var persistentFlags = &PersistentFlags
+
+var RootCmd = &cobra.Command{
+	Use:   "wtf",
+	Short: "Watt TF (wtf) is a tool for building Terraform configurations from structured input.",
+	Long: `Watt TF (wtf) is a command-line tool that allows you to build Terraform configurations
+from structured input files (like JSON or YAML) using a configuration file that defines transformations.`,
+}
+
+func init() {
+	RootCmd.PersistentFlags().BoolVar(&persistentFlags.Verbose, "verbose", false, "Enable verbose output")
+	RootCmd.AddCommand(buildCmd)
+}
+
+func Run() error {
+	return RootCmd.Execute()
 }
