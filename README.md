@@ -3,7 +3,7 @@
   <h1>Watt TF</h1>
   <p><strong>Terraform without the HCL gymnastics.</strong></p>
   <p>
-    <a href="https://github.com/devsebastianops/watt-tf/actions"><img src="https://img.shields.io/github/actions/workflow/status/devsebastianops/watt-tf/ci.yml?branch=main&style=flat-square" alt="CI Status"></a>
+    <a href="https://github.com/devsebastianops/watt-tf/actions"><img src="https://img.shields.io/github/actions/workflow/status/devsebastianops/watt-tf/on-pull-request-ci.yaml?branch=main&style=flat-square" alt="CI Status"></a>
     <a href="https://github.com/devsebastianops/watt-tf/releases"><img src="https://img.shields.io/github/v/release/devsebastianops/watt-tf?style=flat-square" alt="Latest Release"></a>
     <a href="https://github.com/devsebastianops/watt-tf/blob/main/LICENSE"><img src="https://img.shields.io/github/license/devsebastianops/watt-tf?style=flat-square" alt="License"></a>
   </p>
