@@ -9,6 +9,29 @@ on:
       - main
   
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
+          cache-dependency-path: 'go.sum'
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run Linter & Format Check
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+            echo "The following files are not formatted properly (run 'go fmt ./...'):"
+            gofmt -s -l .
+            exit 1
+          fi
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
@@ -27,3 +50,21 @@ jobs:
 
       - name: Run tests
         run: go test ./tests/e2e/ -v
+
+  test-install-script:
+    name: Test Install Script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install Watt TF
+        run: ./install.sh
+
+      - name: Verify installation
+        run: |
+          if ! command -v wtf &> /dev/null; then
+            echo "wtf command not found after installation"
+            exit 1
+          fi
+          wtf help

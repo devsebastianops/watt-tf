@@ -1,0 +1,26 @@
+/* docs/.vitepress/theme/custom.css */
+
+:root {
+  /* Die Haupt-Brand-Farbe (Sattes Orange für Links, Buttons etc.) */
+  --vp-c-brand-1: #f97316; /* Tailwind orange-500 */
+  --vp-c-brand-2: #ea580c; /* Dunkleres Orange für Hover-Effekte (orange-600) */
+  --vp-c-brand-3: #c2410c; /* Noch dunkler für aktive Klicks (orange-700) */
+  
+  /* Sanfteres Orange/Gelb für dezente Hintergründe (z.B. aktive Sidebar-Elemente) */
+  --vp-c-brand-soft: rgba(249, 115, 22, 0.14);
+
+  /* Akzentfarbe für Highlights (Elektrisches Gelb) */
+  --vp-c-warning-1: #facc15; /* Tailwind yellow-400 */
+}
+
+/* Optional: Falls du den lila Verlauf auf der Startseite im Hero-Bereich 
+   ebenfalls passend einfärben willst (Orange zu Gelb) */
+.VPButton.brand {
+  border-color: var(--vp-c-brand-1) !important;
+  background-color: var(--vp-c-brand-1) !important;
+}
+
+.VPButton.brand:hover {
+  border-color: var(--vp-c-brand-2) !important;
+  background-color: var(--vp-c-brand-2) !important;
+}
