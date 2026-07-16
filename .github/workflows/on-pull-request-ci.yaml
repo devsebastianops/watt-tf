@@ -50,3 +50,21 @@ jobs:
 
       - name: Run tests
         run: go test ./tests/e2e/ -v
+
+  test-install-script:
+    name: Test Install Script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Run install script test
+        run: ./install.sh
+
+      - name: Verify installation
+        run: |
+          if ! command -v wtf &> /dev/null; then
+            echo "wtf command not found after installation"
+            exit 1
+          fi
+          wtf --version
