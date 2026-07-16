@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  },
+  "name": "watt tf docs",
+  "version": "1.0.0",
+  "description": "Documentation for watt tf",
+  "keywords": [],
+  "author": "DevSebastianOps <hi@devsebastianops.com>",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.40"
+  }
+}
