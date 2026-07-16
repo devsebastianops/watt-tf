@@ -58,7 +58,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Run install script test
+      - name: Install Watt TF
         run: ./install.sh
 
       - name: Verify installation
