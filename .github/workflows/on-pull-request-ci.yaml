@@ -67,4 +67,4 @@ jobs:
             echo "wtf command not found after installation"
             exit 1
           fi
-          wtf --help
+          wtf help
