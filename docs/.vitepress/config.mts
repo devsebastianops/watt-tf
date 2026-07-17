@@ -14,7 +14,7 @@ export default defineConfig({
   ],
 
   themeConfig: {
-    logo: "/assets/watt-tf-mascott-SPARKS.png",
+    logo: "/assets/watt-tf-mascott-sticker-outlines.png",
 
     search: {
       provider: "local"

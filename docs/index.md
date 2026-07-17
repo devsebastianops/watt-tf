@@ -6,7 +6,7 @@ hero:
   text: "Terraform without the HCL gymnastics."
   tagline: "The declarative blueprint engine that compiles raw data into clean Terraform JSON. Because writing complex nested loops in HCL shouldn't make you question your career choices."
   image:
-    src: /assets/watt-tf-mascott-SPARKS.png
+    src: /assets/watt-tf-mascott-sticker-outlines.png
     alt: Watt TF - The Angry Lightbulb of Devops
   actions:
     - theme: brand
