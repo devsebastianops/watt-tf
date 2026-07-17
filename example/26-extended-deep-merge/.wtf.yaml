@@ -1,0 +1,12 @@
+transform:
+  - target: resource.aws_s3_bucket.main
+    value:
+      tags:
+        Environment: "${input.environment}"
+        Project: "${input.project_name}"
+
+  # Zweiter Zugriff auf das GLEICHE tiefere Map-Target:
+  - target: resource.aws_s3_bucket.main
+    value:
+      tags:
+        ManagedBy: "WattTF"

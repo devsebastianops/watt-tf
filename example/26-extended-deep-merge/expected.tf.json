@@ -1,0 +1,14 @@
+{
+  "resource": {
+    "aws_s3_bucket": {
+      "main": {
+        "bucket": "my-app-bucket",
+        "tags": {
+          "Environment": "prod",
+          "Project": "my-app",
+          "ManagedBy": "WattTF"
+        }
+      }
+    }
+  }
+}

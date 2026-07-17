@@ -1,6 +1,7 @@
 import { defineConfig } from "vitepress";
+import { withMermaid } from 'vitepress-plugin-mermaid'
 
-export default defineConfig({
+const config = defineConfig({
   title: "Watt TF",
   description:
     "Build Terraform from Data. Transform JSON and YAML into Terraform JSON using declarative blueprints.",
@@ -31,7 +32,7 @@ export default defineConfig({
       },
       {
         text: "Examples",
-        link: "/examples/cloud-run"
+        link: "/examples/overview"
       },
       {
         text: "Reference",
@@ -104,49 +105,15 @@ export default defineConfig({
         }
       ],
 
-      "/terraform/": [
-        {
-          text: "Terraform Objects",
-          items: [
-            {
-              text: "Resources",
-              link: "/terraform/resources"
-            },
-            {
-              text: "Modules",
-              link: "/terraform/modules"
-            },
-            {
-              text: "Providers",
-              link: "/terraform/providers"
-            },
-            {
-              text: "Variables",
-              link: "/terraform/variables"
-            },
-            {
-              text: "Outputs",
-              link: "/terraform/outputs"
-            },
-            {
-              text: "Locals",
-              link: "/terraform/locals"
-            },
-            {
-              text: "Terraform Block",
-              link: "/terraform/terraform"
-            }
-          ]
-        }
-      ],
+     
 
       "/examples/": [
         {
           text: "Examples",
           items: [
             {
-              text: "Cloud Run",
-              link: "/examples/cloud-run"
+              text: "Overview",
+              link: "/examples/overview"
             },
             {
               text: "Terraform Modules",
@@ -214,3 +181,5 @@ export default defineConfig({
     }
   }
 });
+
+export default withMermaid(config);

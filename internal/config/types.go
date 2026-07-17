@@ -9,8 +9,8 @@ type Config struct {
 }
 
 type Transformable struct {
-	Target  string                 `yaml:"target"`
-	If      string                 `yaml:"if,omitempty"`
-	Value   map[string]interface{} `yaml:"value,omitempty"`
-	ForEach string                 `yaml:"for_each,omitempty"`
+	Target  string `yaml:"target"`
+	If      string `yaml:"if,omitempty"`
+	Value   any    `yaml:"value,omitempty"`
+	ForEach string `yaml:"for_each,omitempty"`
 }

@@ -164,8 +164,50 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 	return result, nil
 }
 
+// parsePath zerlegt den Pfad in Segmente und ignoriert Punkte innerhalb von Backticks
+func parsePath(path string) []string {
+	var parts []string
+	var current strings.Builder
+	inBackticks := false
+
+	for i := 0; i < len(path); i++ {
+		char := path[i]
+
+		switch char {
+		case '`':
+			inBackticks = !inBackticks
+			// Die Backticks selbst wollen wir nicht im finalen JSON-Key haben,
+			// darum schreiben wir sie nicht in den current-Buffer.
+		case '.':
+			if inBackticks {
+				// Wenn wir in Backticks sind, ist der Punkt Teil des Keys!
+				current.WriteByte(char)
+			} else {
+				// Außerhalb von Backticks trennt der Punkt das Segment
+				if current.Len() > 0 {
+					parts = append(parts, current.String())
+					current.Reset()
+				}
+			}
+		default:
+			current.WriteByte(char)
+		}
+	}
+
+	if current.Len() > 0 {
+		parts = append(parts, current.String())
+	}
+
+	return parts
+}
+
 func unflatten(result map[string]any, path string, value any) {
-	parts := strings.Split(path, ".")
+	// Nutze den intelligenten Parser statt strings.Split
+	parts := parsePath(path)
+	if len(parts) == 0 {
+		return
+	}
+
 	current := result
 
 	for i := 0; i < len(parts)-1; i++ {
@@ -179,7 +221,7 @@ func unflatten(result map[string]any, path string, value any) {
 		if nextMap, ok := current[part].(map[string]any); ok {
 			current = nextMap
 		} else {
-			// Fallback, falls jemand Pfadkonflikte erzeugt (z.B. target: a und target: a.b)
+			// Fallback bei Pfadkonflikten (z.B. target: a und target: a.b)
 			newMap := make(map[string]any)
 			current[part] = newMap
 			current = newMap
