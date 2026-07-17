@@ -100,6 +100,10 @@ const config = defineConfig({
             {
               text: "Schema Validation",
               link: "/configuration/schema-validation"
+            },
+            {
+              text: "Extending Watt TF",
+              link: "/configuration/plugins"
             }
           ]
         }
