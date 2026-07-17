@@ -111,12 +111,10 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 					return nil, fmt.Errorf("failed to interpolate value for item %d: %w", idx, err)
 				}
 
-				// Unflatten the result
-				if mapVal, ok := interpolatedValue.(map[string]any); ok {
-					unflatten(result, targetStr, mapVal)
-				} else {
-					unflatten(result, targetStr, interpolatedValue)
-				}
+				// Construct a isolated patch for this target and merge it deeply into the result
+				itemPatch := make(map[string]any)
+				unflatten(itemPatch, targetStr, interpolatedValue)
+				result = deepMerge(result, itemPatch)
 			}
 
 		} else {
@@ -149,22 +147,19 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 				return nil, err
 			}
 
-			// 3. Span up the result (Unflattening)
+			// 3. Construct a isolated patch for this target and merge it deeply into the result
 			logger.Debug("interpolation completed", "target", target)
-			if mapVal, ok := interpolatedValue.(map[string]any); ok {
-				unflatten(result, target, mapVal)
-			} else {
-				unflatten(result, target, interpolatedValue)
-			}
+			patch := make(map[string]any)
+			unflatten(patch, target, interpolatedValue)
+			result = deepMerge(result, patch)
 		}
 	}
 
-	// Return the result map (no file writing here)
 	logger.Debug("all transformations completed successfully")
 	return result, nil
 }
 
-// parsePath zerlegt den Pfad in Segmente und ignoriert Punkte innerhalb von Backticks
+// parsePath splits the path into segments and ignores dots within backticks
 func parsePath(path string) []string {
 	var parts []string
 	var current strings.Builder
@@ -176,14 +171,11 @@ func parsePath(path string) []string {
 		switch char {
 		case '`':
 			inBackticks = !inBackticks
-			// Die Backticks selbst wollen wir nicht im finalen JSON-Key haben,
-			// darum schreiben wir sie nicht in den current-Buffer.
+			// The backticks themselves should not be included in the final JSON key
 		case '.':
 			if inBackticks {
-				// Wenn wir in Backticks sind, ist der Punkt Teil des Keys!
 				current.WriteByte(char)
 			} else {
-				// Außerhalb von Backticks trennt der Punkt das Segment
 				if current.Len() > 0 {
 					parts = append(parts, current.String())
 					current.Reset()
@@ -202,7 +194,6 @@ func parsePath(path string) []string {
 }
 
 func unflatten(result map[string]any, path string, value any) {
-	// Nutze den intelligenten Parser statt strings.Split
 	parts := parsePath(path)
 	if len(parts) == 0 {
 		return
@@ -217,11 +208,9 @@ func unflatten(result map[string]any, path string, value any) {
 			current[part] = make(map[string]any)
 		}
 
-		// Typ-Absicherung: Falls der Pfad bereits existiert, MUSS es eine Map sein
 		if nextMap, ok := current[part].(map[string]any); ok {
 			current = nextMap
 		} else {
-			// Fallback bei Pfadkonflikten (z.B. target: a und target: a.b)
 			newMap := make(map[string]any)
 			current[part] = newMap
 			current = newMap
@@ -230,15 +219,41 @@ func unflatten(result map[string]any, path string, value any) {
 
 	lastPart := parts[len(parts)-1]
 
-	// Deep Merge für das finale Value, falls dort bereits Daten liegen
+	// IMPORTANT: If a map already exists at the target AND the new value is also a map,
+	// we use deepMerge to merge the keys of deeper levels properly.
 	if existingMap, ok := current[lastPart].(map[string]any); ok {
 		if newMap, ok := value.(map[string]any); ok {
-			for k, v := range newMap {
-				existingMap[k] = v
-			}
+			current[lastPart] = deepMerge(existingMap, newMap)
 			return
 		}
 	}
 
 	current[lastPart] = value
+}
+
+// deepMerge recursively merges src into dst and returns the result.
+// Existing maps at deeper levels are combined, scalar values are overwritten.
+func deepMerge(dst, src map[string]any) map[string]any {
+	if dst == nil {
+		return src
+	}
+
+	for k, srcVal := range src {
+		dstVal, exists := dst[k]
+		if !exists {
+			dst[k] = srcVal
+			continue
+		}
+
+		srcMap, srcOk := srcVal.(map[string]any)
+		dstMap, dstOk := dstVal.(map[string]any)
+
+		if srcOk && dstOk {
+			dst[k] = deepMerge(dstMap, srcMap)
+		} else {
+			dst[k] = srcVal
+		}
+	}
+
+	return dst
 }

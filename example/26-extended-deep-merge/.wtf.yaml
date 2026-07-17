@@ -1,6 +1,7 @@
 transform:
   - target: resource.aws_s3_bucket.main
     value:
+      bucket: "${input.project_name}-bucket"
       tags:
         Environment: "${input.environment}"
         Project: "${input.project_name}"
