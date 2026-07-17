@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./docs/assets/watt-tf-mascott-SPARKS.png" alt="Watt TF Mascot" width="180" />
+  <img src="./docs/public/assets/watt-tf-mascott-SPARKS.png" alt="Watt TF Mascot" width="180" />
   <h1>Watt TF</h1>
   <p><strong>Terraform without the HCL gymnastics.</strong></p>
   <p>
