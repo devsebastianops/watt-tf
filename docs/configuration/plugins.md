@@ -1,6 +1,6 @@
-# Plugins
+# Extending Watt TF with Plugins
 
-Plugins allow you to extend the functionality of Watt-TF by hooking into the transformation process at specific points. This can be useful for adding custom logic, modifying data, or integrating with external systems.
+Plugins allow you to extend the functionality of Watt TF by hooking into the transformation process at specific points. This can be useful for adding custom logic, modifying data, or integrating with external systems.
 
 ## Plugin Lifecycle Events
 
@@ -11,7 +11,7 @@ Plugins allow you to extend the functionality of Watt-TF by hooking into the tra
 
 ## How Plugins Work
 
-Plugins can be written in any language, as long as they can be executed from the command line. Watt-TF will call the plugin script with the event name and all relevant data passed as JSON via standard input. The plugin should read the input, perform any necessary modifications, and output the modified data as JSON to standard output.
+Plugins can be written in any language, as long as they can be executed from the command line. Watt TF will call the plugin script with the event name and all relevant data passed as JSON via standard input. The plugin should read the input, perform any necessary modifications, and output the modified data as JSON to standard output.
 
 ### Incoming Data 
 
@@ -19,7 +19,7 @@ When a plugin is triggered, it receives the following JSON structure as input:
 
 ```json
 {
-    "status": "1.0",
+    "version": "1.0",
     "event": "beforeTransform",
     "data": {
         "input": {
@@ -43,7 +43,7 @@ When a plugin is triggered, it receives the following JSON structure as input:
 | version | The version of the plugin API. | "1.0" |
 | event | The lifecycle event that triggered the plugin. | `beforeTransform` or `afterTransform` |
 | data | The data relevant to the event. | See below |
-| data.input | The input data provided to Watt-TF. | JSON object, coming directly from your `--input` file |
+| data.input | The input data provided to Watt TF. | JSON object, coming directly from your `--input` file |
 | data.env | The environment variables available to the plugin. | JSON object, containing all environment variables |
 | data.result | The result of the transformation process. | JSON object, initially empty for `beforeTransform`, populated for `afterTransform` |
 
@@ -142,7 +142,7 @@ This example plugin modifies the input data before the transformation process be
 
 ## How to Use a Plugin
 
-To use a plugin with Watt-TF, you need to specify the plugin in your `.wtf.yaml` configuration file. Here's an example configuration that uses the above plugin:
+To use a plugin with Watt TF, you need to specify the plugin in your `.wtf.yaml` configuration file. Here's an example configuration that uses the above plugin:
 
 ```yaml
 plugins:
@@ -154,6 +154,6 @@ plugins:
     - plugin.py
 ```
 
-This configuration tells Watt-TF to execute the `plugin.py` script before the transformation process begins. The plugin will receive the input data, modify it, and return the modified data to Watt-TF for further processing.
+This configuration tells Watt TF to execute the `plugin.py` script before the transformation process begins. The plugin will receive the input data, modify it, and return the modified data to Watt TF for further processing.
 
 All paths in arguments are relative to the `.wtf.yaml` file. You can also use absolute paths if needed.

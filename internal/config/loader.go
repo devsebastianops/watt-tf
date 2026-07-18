@@ -93,8 +93,8 @@ func loadConfigWithoutIncludes(filePath string) (*Config, error) {
 		condition, _ := transformableMap["if"].(string)
 
 		// Parse value (if template is not used)
-		var value map[string]interface{}
-		if val, ok := transformableMap["value"].(map[string]interface{}); ok {
+		var value any
+		if val, exists := transformableMap["value"]; exists {
 			value = val
 		}
 

@@ -1,0 +1,20 @@
+{
+  "resource": {
+    "aws_instance": {
+      "web": {
+        "tags": {
+          "company.com/managed-by": "Watt TF"
+        }
+      }
+    }
+  },
+  "kubernetes_deployment": {
+    "api": {
+      "metadata": {
+        "annotations": {
+          "cert-manager.io/cluster-issuer": "letsencrypt-prod"
+        }
+      }
+    }
+  }
+}

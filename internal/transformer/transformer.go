@@ -111,12 +111,10 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 					return nil, fmt.Errorf("failed to interpolate value for item %d: %w", idx, err)
 				}
 
-				// Unflatten the result
-				if mapVal, ok := interpolatedValue.(map[string]any); ok {
-					unflatten(result, targetStr, mapVal)
-				} else {
-					unflatten(result, targetStr, interpolatedValue)
-				}
+				// Construct a isolated patch for this target and merge it deeply into the result
+				itemPatch := make(map[string]any)
+				unflatten(itemPatch, targetStr, interpolatedValue)
+				result = deepMerge(result, itemPatch)
 			}
 
 		} else {
@@ -149,23 +147,58 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 				return nil, err
 			}
 
-			// 3. Span up the result (Unflattening)
+			// 3. Construct a isolated patch for this target and merge it deeply into the result
 			logger.Debug("interpolation completed", "target", target)
-			if mapVal, ok := interpolatedValue.(map[string]any); ok {
-				unflatten(result, target, mapVal)
-			} else {
-				unflatten(result, target, interpolatedValue)
-			}
+			patch := make(map[string]any)
+			unflatten(patch, target, interpolatedValue)
+			result = deepMerge(result, patch)
 		}
 	}
 
-	// Return the result map (no file writing here)
 	logger.Debug("all transformations completed successfully")
 	return result, nil
 }
 
+// parsePath splits the path into segments and ignores dots within backticks
+func parsePath(path string) []string {
+	var parts []string
+	var current strings.Builder
+	inBackticks := false
+
+	for i := 0; i < len(path); i++ {
+		char := path[i]
+
+		switch char {
+		case '`':
+			inBackticks = !inBackticks
+			// The backticks themselves should not be included in the final JSON key
+		case '.':
+			if inBackticks {
+				current.WriteByte(char)
+			} else {
+				if current.Len() > 0 {
+					parts = append(parts, current.String())
+					current.Reset()
+				}
+			}
+		default:
+			current.WriteByte(char)
+		}
+	}
+
+	if current.Len() > 0 {
+		parts = append(parts, current.String())
+	}
+
+	return parts
+}
+
 func unflatten(result map[string]any, path string, value any) {
-	parts := strings.Split(path, ".")
+	parts := parsePath(path)
+	if len(parts) == 0 {
+		return
+	}
+
 	current := result
 
 	for i := 0; i < len(parts)-1; i++ {
@@ -175,11 +208,9 @@ func unflatten(result map[string]any, path string, value any) {
 			current[part] = make(map[string]any)
 		}
 
-		// Typ-Absicherung: Falls der Pfad bereits existiert, MUSS es eine Map sein
 		if nextMap, ok := current[part].(map[string]any); ok {
 			current = nextMap
 		} else {
-			// Fallback, falls jemand Pfadkonflikte erzeugt (z.B. target: a und target: a.b)
 			newMap := make(map[string]any)
 			current[part] = newMap
 			current = newMap
@@ -188,15 +219,41 @@ func unflatten(result map[string]any, path string, value any) {
 
 	lastPart := parts[len(parts)-1]
 
-	// Deep Merge für das finale Value, falls dort bereits Daten liegen
+	// IMPORTANT: If a map already exists at the target AND the new value is also a map,
+	// we use deepMerge to merge the keys of deeper levels properly.
 	if existingMap, ok := current[lastPart].(map[string]any); ok {
 		if newMap, ok := value.(map[string]any); ok {
-			for k, v := range newMap {
-				existingMap[k] = v
-			}
+			current[lastPart] = deepMerge(existingMap, newMap)
 			return
 		}
 	}
 
 	current[lastPart] = value
+}
+
+// deepMerge recursively merges src into dst and returns the result.
+// Existing maps at deeper levels are combined, scalar values are overwritten.
+func deepMerge(dst, src map[string]any) map[string]any {
+	if dst == nil {
+		return src
+	}
+
+	for k, srcVal := range src {
+		dstVal, exists := dst[k]
+		if !exists {
+			dst[k] = srcVal
+			continue
+		}
+
+		srcMap, srcOk := srcVal.(map[string]any)
+		dstMap, dstOk := dstVal.(map[string]any)
+
+		if srcOk && dstOk {
+			dst[k] = deepMerge(dstMap, srcMap)
+		} else {
+			dst[k] = srcVal
+		}
+	}
+
+	return dst
 }
