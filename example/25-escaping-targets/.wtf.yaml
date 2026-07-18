@@ -1,7 +1,7 @@
 transform:
 # The backticks ensure "company.com" remains a single JSON key
 - target: "resource.aws_instance.web.tags.`company.com/managed-by`"
-  value: "WattTF"
+  value: "Watt TF"
   
 # Useful for complex cloud annotations
 - target: "kubernetes_deployment.api.metadata.annotations.`cert-manager.io/cluster-issuer`"

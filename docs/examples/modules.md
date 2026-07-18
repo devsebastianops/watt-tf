@@ -40,7 +40,7 @@ transform:
       price_class: ${item.price_class}
 
       tags:
-        ManagedBy: "WattTF"
+        ManagedBy: "Watt TF"
         Owner: ${input.team}
 ```
 
@@ -69,7 +69,7 @@ The generated `static-sites.tf.json` will look like this:
       "domain_name": "blog.mycompany.com",
       "price_class": "PriceClass_100",
       "tags": {
-        "ManagedBy": "WattTF",
+        "ManagedBy": "Watt TF",
         "Owner": "marketing"
       }
     },
@@ -80,7 +80,7 @@ The generated `static-sites.tf.json` will look like this:
       "domain_name": "docs.mycompany.com",
       "price_class": "PriceClass_All",
       "tags": {
-        "ManagedBy": "WattTF",
+        "ManagedBy": "Watt TF",
         "Owner": "marketing"
       }
     }

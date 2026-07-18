@@ -24,6 +24,8 @@ go build -o wtf ./cmd/wtf/main.go
 ```
 :::
 
+<br>
+
 ::: tip
 We recommend to use the installer script, as it will download the latest release and put it in your path.
 :::

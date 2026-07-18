@@ -37,10 +37,6 @@ const config = defineConfig({
       {
         text: "Reference",
         link: "/reference/cli"
-      },
-      {
-        text: "GitHub",
-        link: "https://github.com/devsebastianops/watt-tf"
       }
     ],
 

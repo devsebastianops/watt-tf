@@ -1,12 +1,12 @@
 # Input Schema Validation
 
-When building complex infrastructure topologies, you want to ensure that the input variables (`input.json` or `input.yaml`) passed into WattTF strictly adhere to your expected data formats. 
+When building complex infrastructure topologies, you want to ensure that the input variables (`input.json` or `input.yaml`) passed into Watt TF strictly adhere to your expected data formats. 
 
-WattTF allows you to validate your inputs against a custom **JSON Schema** before any transformations are executed. This prevents malformed data or missing attributes from breaking your blueprint execution halfway through.
+Watt TF allows you to validate your inputs against a custom **JSON Schema** before any transformations are executed. This prevents malformed data or missing attributes from breaking your blueprint execution halfway through.
 
 ## The `--schema` Flag
 
-You can enforce input validation by passing a local path or a remote URL of a JSON Schema file to the `watttf build` command via the `--schema` flag.
+You can enforce input validation by passing a local path or a remote URL of a JSON Schema file to the `wtf build` command via the `--schema` flag.
 
 ```bash
 wtf build \
@@ -25,7 +25,7 @@ If the data inside `inputs.prod.yaml` violates the structural rules defined in `
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "WattTF Input Schema",
+  "title": "Watt TF Input Schema",
   "type": "object",
   "properties": {
     "environment": {

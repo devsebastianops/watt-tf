@@ -4,8 +4,6 @@ The `target` property in a transformation block tells **Watt TF** exactly where 
 
 By utilizing a flexible dot-notated string syntax, Watt TF acts as an automated structural architect—building deeply nested objects on the fly without requiring you to pre-define the parent object trees.
 
----
-
 ## Dynamic Object Creation
 
 When Watt TF processes a target path like `resource.aws_s3_bucket.main`, it evaluates the string from left to right:
@@ -15,8 +13,6 @@ When Watt TF processes a target path like `resource.aws_s3_bucket.main`, it eval
 3. It resolves the final leaf node (`main`) and assigns your `value` payload directly to it.
 
 Because this evaluation happens dynamically in memory, you can safely write to any deep path without worrying about initializing empty parent blocks.
-
----
 
 ## Dynamic Targets (String Interpolation)
 
@@ -49,7 +45,7 @@ To enforce a literal dot inside a single path segment, wrap that specific segmen
 transform:
   # The backticks ensure "company.com" remains a single JSON key
   - target: resource.aws_instance.web.tags.`[company.com/managed-by](https://company.com/managed-by)`
-    value: "WattTF"
+    value: "Watt TF"
     
   # Useful for complex cloud annotations
   - target: resource.kubernetes_deployment.api.metadata.annotations.`cert-manager.io/cluster-issuer`
@@ -64,7 +60,7 @@ The compiled output correctly preserves the dot-notation inside the key name:
     "aws_instance": {
       "web": {
         "tags": {
-          "[company.com/managed-by](https://company.com/managed-by)": "WattTF"
+          "[company.com/managed-by](https://company.com/managed-by)": "Watt TF"
         }
       }
     }

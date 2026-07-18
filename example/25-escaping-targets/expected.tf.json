@@ -3,7 +3,7 @@
     "aws_instance": {
       "web": {
         "tags": {
-          "company.com/managed-by": "WattTF"
+          "company.com/managed-by": "Watt TF"
         }
       }
     }

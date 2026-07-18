@@ -47,7 +47,7 @@ transform:
   # 2. Generate standard corporate Tags automatically
   - target: resource.aws_ecs_task_definition.${input.service_name}.tags
     value:
-      ManagedBy: "PlatformTeam-WattTF"
+      ManagedBy: "PlatformTeam-Watt TF"
       OwnerTeam: ${input.team}
       Criticality: ${input.tier}
 

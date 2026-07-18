@@ -10,4 +10,4 @@ transform:
   - target: resource.aws_s3_bucket.main
     value:
       tags:
-        ManagedBy: "WattTF"
+        ManagedBy: "Watt TF"

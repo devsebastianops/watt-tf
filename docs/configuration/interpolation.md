@@ -1,6 +1,6 @@
 # Interpolation
 
-WattTF uses Google's CEL (Common Expression Language) to provide fast, safe, and powerful interpolation for your Terraform blueprints. Interpolation can be used dynamically within both target paths and value blocks.
+Watt TF uses Google's CEL (Common Expression Language) to provide fast, safe, and powerful interpolation for your Terraform blueprints. Interpolation can be used dynamically within both target paths and value blocks.
 
 ## Context Variables
 
@@ -22,7 +22,7 @@ transform:
       bucket: "company-${input.project_name}-bucket"
 ```
 
-If a string consists only of an interpolation expression, WattTF preserves the underlying type (e.g., boolean, integer, map, or list) instead of forcing it into a string:
+If a string consists only of an interpolation expression, Watt TF preserves the underlying type (e.g., boolean, integer, map, or list) instead of forcing it into a string:
 
 ```yaml
 transform:
