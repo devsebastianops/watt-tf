@@ -1,6 +1,6 @@
 # Configuration
 
-The Watt TF blueprint file (typically `.wtf.yaml` or `blueprint.yaml`) is the core definition of your infrastructure transformations. It follows a declarative structure that maps input data to Terraform resources.
+The Watt TF blueprint file (typically `blueprint.yaml`) is the core definition of your infrastructure transformations. It follows a declarative structure that maps input data to Terraform resources.
 
 ## Top Level Structure
 

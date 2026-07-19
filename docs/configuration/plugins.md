@@ -146,7 +146,7 @@ This example plugin modifies the input data before the transformation process be
 
 ## How to Use a Plugin
 
-To use a plugin with Watt TF, you need to specify the plugin in your `.wtf.yaml` configuration file. Here's an example configuration that uses the above plugin:
+To use a plugin with Watt TF, you need to specify the plugin in your `blueprint.yaml` configuration file. Here's an example configuration that uses the above plugin:
 
 ```yaml
 plugins:
@@ -160,4 +160,4 @@ plugins:
 
 This configuration tells Watt TF to execute the `plugin.py` script before the transformation process begins. The plugin will receive the input data, modify it, and return the modified data to Watt TF for further processing.
 
-All paths in arguments are relative to the `.wtf.yaml` file. You can also use absolute paths if needed.
+All paths in arguments are relative to the `blueprint.yaml` file. You can also use absolute paths if needed.

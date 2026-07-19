@@ -23,14 +23,14 @@ go test ./tests/e2e -v -count=1
 
 Each test:
 1. Reads the input file (`.json`, `.yaml`, or `.yml`)
-2. Loads the `.wtf.yaml` configuration
+2. Loads the `blueprint.yaml` configuration
 3. Runs the transformer
 4. Compares the result with `expected.tf.json`
 
 For a test to pass:
 - The example directory must contain:
   - `input.json` or `input.yaml` (or `.yml`)
-  - `.wtf.yaml` configuration
+  - `blueprint.yaml` configuration
   - `expected.tf.json` expected output
 
 ## Adding a New Test
@@ -38,7 +38,7 @@ For a test to pass:
 1. Create a new directory under `example/XX-description/`
 2. Add:
    - `input.json` or `input.yaml`
-   - `.wtf.yaml`
+   - `blueprint.yaml`
    - `expected.tf.json` (the expected output)
    - `README.md` (optional documentation)
 
@@ -70,5 +70,5 @@ Actual:
 ```
 
 Use this to identify differences and adjust either:
-- The `.wtf.yaml` configuration
+- The `blueprint.yaml` configuration
 - The `expected.tf.json` file

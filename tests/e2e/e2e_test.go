@@ -74,7 +74,7 @@ func runE2ETest(t *testing.T, examplePath string) {
 		t.Fatalf("no input file found in %s", examplePath)
 	}
 
-	configFile := filepath.Join(examplePath, ".wtf.yaml")
+	configFile := filepath.Join(examplePath, "blueprint.yaml")
 	if _, err := os.Stat(configFile); err != nil {
 		t.Fatalf("config file not found: %s", configFile)
 	}

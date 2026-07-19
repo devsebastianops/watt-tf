@@ -33,7 +33,8 @@ var buildCmd = &cobra.Command{
 }
 
 func init() {
-	buildCmd.Flags().StringVarP(&buildOptions.ConfigFile, "config", "c", ".wtf.yaml", "Path to the configuration file")
+	buildCmd.Flags().StringVarP(&buildOptions.ConfigFile, "config", "c", ".wtf.yaml", "Path to the configuration file  (deprecated, use --blueprint instead)")
+	buildCmd.Flags().StringVarP(&buildOptions.ConfigFile, "blueprint", "b", "blueprint.yaml", "Path to the blueprint YAML file")
 	buildCmd.Flags().StringVarP(&buildOptions.InputFile, "input", "i", "", "Path to the input file")
 	buildCmd.Flags().StringVarP(&buildOptions.OutputFile, "output", "o", "", "Path to the output file")
 	buildCmd.Flags().StringVarP(&buildOptions.SchemaFile, "schema", "s", "", "Path to the schema file")
