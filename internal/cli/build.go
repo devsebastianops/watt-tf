@@ -13,12 +13,13 @@ import (
 )
 
 type BuildOptions struct {
-	ConfigFile string
-	InputFile  string
-	OutputFile string
-	SchemaFile string
-	StripNulls bool
-	Strict     bool
+	ConfigFile    string
+	BlueprintFile string
+	InputFile     string
+	OutputFile    string
+	SchemaFile    string
+	StripNulls    bool
+	Strict        bool
 }
 
 var buildOptions = BuildOptions{}
@@ -33,8 +34,8 @@ var buildCmd = &cobra.Command{
 }
 
 func init() {
-	buildCmd.Flags().StringVarP(&buildOptions.ConfigFile, "config", "c", ".wtf.yaml", "Path to the configuration file  (deprecated, use --blueprint instead)")
-	buildCmd.Flags().StringVarP(&buildOptions.ConfigFile, "blueprint", "b", "blueprint.yaml", "Path to the blueprint YAML file")
+	buildCmd.Flags().StringVarP(&buildOptions.ConfigFile, "config", "c", "", "Path to the configuration file  (deprecated, use --blueprint instead)")
+	buildCmd.Flags().StringVarP(&buildOptions.BlueprintFile, "blueprint", "b", "blueprint.yaml", "Path to the blueprint YAML file")
 	buildCmd.Flags().StringVarP(&buildOptions.InputFile, "input", "i", "", "Path to the input file")
 	buildCmd.Flags().StringVarP(&buildOptions.OutputFile, "output", "o", "", "Path to the output file")
 	buildCmd.Flags().StringVarP(&buildOptions.SchemaFile, "schema", "s", "", "Path to the schema file")
@@ -48,13 +49,29 @@ func build() error {
 
 	logger.Debug("building project",
 		"config", buildOptions.ConfigFile,
+		"blueprint", buildOptions.BlueprintFile,
 		"input", buildOptions.InputFile,
 		"output", buildOptions.OutputFile,
 		"strict", buildOptions.Strict,
 		"schema", buildOptions.SchemaFile,
 		"verbose", persistentFlags.Verbose)
 
-	config, configErr := config.LoadConfig(buildOptions.ConfigFile)
+	var loadPath string
+	// Check if user passed config file, which is deprecated
+	if buildOptions.ConfigFile != "" {
+		logger.Warn("the --config flag is deprecated, please use --blueprint instead")
+		loadPath = buildOptions.ConfigFile
+	}
+
+	if buildOptions.BlueprintFile != "blueprint.yaml" && buildOptions.ConfigFile != "" {
+		logger.Warn("both --config and --blueprint flags are set; --config will be ignored")
+	}
+
+	if buildOptions.BlueprintFile != "blueprint.yaml" {
+		loadPath = buildOptions.BlueprintFile
+	}
+
+	config, configErr := config.LoadConfig(loadPath)
 	if configErr != nil {
 		return configErr
 	}
@@ -89,7 +106,7 @@ func build() error {
 		Registry:    registry,
 		Input:       input,
 		Environment: envVars,
-		BasePath:    buildOptions.ConfigFile,
+		BasePath:    loadPath,
 		Result:      nil,
 	}
 	context, err := plugin.DispatchEvents(dispatchConfig)
@@ -107,7 +124,7 @@ func build() error {
 		Registry:    registry,
 		Input:       input,
 		Environment: envVars,
-		BasePath:    buildOptions.ConfigFile,
+		BasePath:    loadPath,
 		Result:      result,
 	}
 	contextAfter, err := plugin.DispatchEvents(dispatchConfigAfter)
