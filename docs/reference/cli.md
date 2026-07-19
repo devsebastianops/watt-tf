@@ -21,9 +21,10 @@ wtf build [options]
 | `--schema`<br> `-s` | `string` | Path/URL to a JSON Schema to validate the input file before transformation. |
 | `--strict` | `flag` | Enables strict mode (halts on missing keys or syntax errors). |
 | `--strip-nulls` | `flag` | Removes any keys with `null` values from the final output. |
+| `--config`<br> `-c` | `string` | Path to a configuration file _(deprecated)_ |
 
 ::: warning Deprecation Note
-Previously, it was possible to pass blueprints to Watt TF using `--config` or `-c`. This is still possible, but will be deprecated in the next major version (v2.0.0).
+Previously, it was possible to pass blueprints to Watt TF using `--config` or `-c`. This is still possible, but will be removed in the next major version (v2.0.0).
 :::
 
 ## Example Pipeline Integration
