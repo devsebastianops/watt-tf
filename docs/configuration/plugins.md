@@ -1,5 +1,9 @@
 # Extending Watt TF with Plugins
 
+::: danger Attention
+Please be aware that you are going to be writing code to extend Watt TF. That means you are responsible for maintenance, further development and security of your plugin. We recommend plugins only when they are absolutely necessary.
+:::
+
 Plugins allow you to extend the functionality of Watt TF by hooking into the transformation process at specific points. This can be useful for adding custom logic, modifying data, or integrating with external systems.
 
 ## Plugin Lifecycle Events
