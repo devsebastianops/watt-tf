@@ -58,4 +58,6 @@ transform:
 
 ```
 
+You can find the full JSON schema for the blueprint configuration here: [Blueprint Schema](/schema/watt-tf-configuration.schema.json).
+
 In case you want to learn more about the key concepts of Watt TF, check out the [Core Concepts](../guide/concepts.md) guide.
