@@ -57,6 +57,12 @@ transform:
     content: ${input.content}
 ```
 
+<br>
+
+::: tip
+We also provide a [schema](/schema/watt-tf-configuration.schema.json) for the blueprint configuration, which can be used for validation and autocompletion in your IDE.
+:::
+
 ## 4. Run the transformation
 
 ```sh

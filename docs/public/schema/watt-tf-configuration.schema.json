@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://watt-tf.dev/schema/config.schema.json",
+  "title": "Watt TF Configuration",
+  "description": "Configuration file for Watt TF.",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "plugins": {
+      "type": "array",
+      "description": "List of plugins to execute.",
+      "items": {
+        "$ref": "#/$defs/plugin"
+      }
+    },
+
+    "include": {
+      "type": "array",
+      "description": "Additional configuration files to include.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "transform": {
+      "type": "array",
+      "description": "Transformation definitions.",
+      "items": {
+        "$ref": "#/$defs/transform"
+      },
+      "minItems": 1
+    }
+  },
+
+  "required": [
+    "transform"
+  ],
+
+  "$defs": {
+    "plugin": {
+      "type": "object",
+      "additionalProperties": false,
+
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Plugin name."
+        },
+
+        "version": {
+          "type": "string",
+          "description": "Plugin version."
+        },
+
+        "on": {
+          "type": "string",
+          "enum": ["beforeTransform", "afterTransform"],
+          "description": "Lifecycle event that triggers the plugin."
+        },
+
+        "cmd": {
+          "type": "string",
+          "description": "Command to execute."
+        },
+
+        "args": {
+          "type": "array",
+          "description": "Command line arguments.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+
+      "required": [
+        "name"
+      ]
+    },
+
+    "transform": {
+      "type": "object",
+      "additionalProperties": false,
+
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "Terraform target to generate."
+        },
+
+        "if": {
+          "type": "string",
+          "description": "CEL expression controlling whether the transformation is executed."
+        },
+
+        "value": {
+          "description": "Input value for the transformation."
+        },
+
+        "for_each": {
+          "type": "string",
+          "description": "CEL expression evaluated as an iterable."
+        }
+      },
+
+      "required": [
+        "target"
+      ]
+    }
+  }
+}
