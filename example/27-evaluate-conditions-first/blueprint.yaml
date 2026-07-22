@@ -1,0 +1,12 @@
+transform:
+  - target: resource.aws_instance.example
+    value:
+      ami: ${input.ami}
+      instance_type: ${input.instance_type}
+  
+  - target: resource.aws_instance.example.tags
+    if: has(input.tags)
+    for_each: input.tags
+    value:
+        "${item_index}": ${item}  
+  

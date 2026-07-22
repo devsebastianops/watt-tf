@@ -44,6 +44,20 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 		condition := transformable.If
 		forEach := transformable.ForEach
 
+		// Conditions must be evaluated before interpolation to avoid unnecessary computation
+		// and to ensure that we don't interpolate values that won't be used.
+		if condition != "" {
+			logger.Debug("evaluating condition", "target", target, "condition", condition)
+			shouldExecute, err := evalCelCondition(condition, env, input, envVars, strict)
+			if err != nil {
+				return nil, fmt.Errorf("failed to evaluate condition '%s': %w", condition, err)
+			}
+			if !shouldExecute {
+				logger.Debug("condition not met, skipping transformation", "target", target)
+				continue
+			}
+		}
+
 		// Check if this is a for_each transformation
 		if forEach != "" {
 			logger.Debug("processing for_each transformation", "target", target, "for_each", forEach)
@@ -92,19 +106,6 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 				}
 				targetStr := interpolatedTarget.(string)
 
-				// Evaluate condition with item context
-				if condition != "" {
-					logger.Debug("evaluating condition with item", "condition", condition, "index", idx)
-					shouldExecute, err := evalCelConditionWithItem(condition, env, input, envVars, item, idx, strict)
-					if err != nil {
-						return nil, fmt.Errorf("failed to evaluate condition '%s' for item %d: %w", condition, idx, err)
-					}
-					if !shouldExecute {
-						logger.Debug("condition not met for item, skipping", "index", idx)
-						continue
-					}
-				}
-
 				// Interpolate value with item context
 				interpolatedValue, err := interpolateWithItem(value, env, input, envVars, item, idx, strict)
 				if err != nil {
@@ -119,7 +120,7 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 
 		} else {
 			// Standard transformation (no for_each)
-			// 0. Interpolate target (supports dynamic names like: resource.aws_s3.${input.name})
+			// 1. Interpolate target (supports dynamic names like: resource.aws_s3.${input.name})
 			interpolatedTarget, err := interpolate(target, env, input, envVars, strict)
 			if err != nil {
 				return nil, fmt.Errorf("failed to interpolate target '%s': %w", target, err)
@@ -127,19 +128,6 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 			target = interpolatedTarget.(string) // Target must result in a string
 
 			logger.Debug("processing transformation", "target", target, "has_condition", condition != "")
-
-			// 1. Evaluate condition (if specified)
-			if condition != "" {
-				logger.Debug("evaluating condition", "target", target, "condition", condition)
-				shouldExecute, err := evalCelCondition(condition, env, input, envVars, strict)
-				if err != nil {
-					return nil, fmt.Errorf("failed to evaluate condition '%s': %w", condition, err)
-				}
-				if !shouldExecute {
-					logger.Debug("condition not met, skipping", "target", target)
-					continue
-				}
-			}
 
 			// 2. Interpolate
 			interpolatedValue, err := interpolate(value, env, input, envVars, strict)
