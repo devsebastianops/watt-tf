@@ -89,8 +89,16 @@ const config = defineConfig({
               link: "/configuration/interpolation"
             },
             {
-              text: "Conditions (CEL)",
+              text: "Conditions",
               link: "/configuration/conditions"
+            },
+            {
+              text: "Loops",
+              link: "/configuration/loops"
+            },
+            {
+              text: "Includes",
+              link: "/configuration/includes"
             },
             {
               text: "Deep Merge",
