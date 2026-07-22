@@ -32,7 +32,7 @@ Imagine you have a Terraform configuration with existing tags, and you want to i
 }
 ```
 
-### 2. Configuration (.wtf.yaml)
+### 2. Configuration (blueprint.yaml)
 
 ```yaml
 transform:

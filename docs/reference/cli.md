@@ -15,12 +15,17 @@ wtf build [options]
 
 | Option | Type | Description |
 | :--- | :--- | :--- |
-| `--config` | `string` | Path to your blueprint YAML file. |
-| `--input` | `string` | Path to your input JSON or YAML file containing variables. |
-| `--output` | `string` | Path where the generated Terraform JSON file will be saved. |
-| `--schema` | `string` | Path/URL to a JSON Schema to validate the input file before transformation. |
+| `--blueprint` <br> `-b` | `string` | Path to your blueprint YAML file. |
+| `--input`<br> `-i` | `string` | Path to your input JSON or YAML file containing variables. |
+| `--output`<br> `-o` | `string` | Path where the generated Terraform JSON file will be saved. |
+| `--schema`<br> `-s` | `string` | Path/URL to a JSON Schema to validate the input file before transformation. |
 | `--strict` | `flag` | Enables strict mode (halts on missing keys or syntax errors). |
-| `--strip-null` | `flag` | Removes any keys with `null` values from the final output. |
+| `--strip-nulls` | `flag` | Removes any keys with `null` values from the final output. |
+| `--config`<br> `-c` | `string` | Path to a configuration file _(deprecated)_ |
+
+::: warning Deprecation Note
+Previously, it was possible to pass blueprints to Watt TF using `--config` or `-c`. This is still possible, but will be removed in the next major version (v2.0.0).
+:::
 
 ## Example Pipeline Integration
 
@@ -28,7 +33,7 @@ In a typical CI/CD scenario (like GitHub Actions or GitLab CI), you would use th
 
 ```bash
 wtf build \
-  --config blueprint.yaml \
+  --blueprint blueprint.yaml \
   --input env.prod.yaml \
   --output main.tf.json \
   --schema schemas/input-schema.json

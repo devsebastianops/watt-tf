@@ -84,7 +84,7 @@ transform:
 ### 3. Transform to Terraform JSON
 
 ```bash
-wtf build --input input.json --config blueprint.yaml --output terraform.json
+wtf build --input input.json --blueprint blueprint.yaml --output terraform.json
 ```
 
 #### Expected Result

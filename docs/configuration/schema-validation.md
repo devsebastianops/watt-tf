@@ -10,7 +10,7 @@ You can enforce input validation by passing a local path or a remote URL of a JS
 
 ```bash
 wtf build \
-  --config blueprint.yaml \
+  --blueprint blueprint.yaml \
   --input inputs.prod.yaml \
   --schema schemas/inputs-schema.json \
   --output main.tf.json
