@@ -127,3 +127,10 @@ transform:
 
 - `item`: The current element in the iteration.
 - `item_index`: The 0-based index of the current element.
+
+
+## Afterword: Continue your journey
+
+From now on you are good to go! You can start writing your own blueprints and input data to generate Terraform JSON configurations.
+
+In case you want to learn more, please check out the [Configuration Overview](/configuration/overview) section for a deeper dive into Watt TF's capabilities.

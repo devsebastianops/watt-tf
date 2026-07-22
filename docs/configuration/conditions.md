@@ -24,18 +24,6 @@ transform:
       monitoring: true
 ```
 
-## Conditional filtering with `for_each`
-
-When combined with `for_each`, the `if` condition acts as a filter. It is evaluated individually for each item in the array. During these iterations, you can use the item variable inside your condition.
-
-```yaml
-transform:
-  - for_each: input.subnets
-    if: item.public == true
-    target: resource.aws_subnet.${item.name}
-    value:
-      map_public_ip_on_launch: true
-```
 
 ## Evaluation Behavior
 
@@ -45,3 +33,11 @@ Defaultwise, if an if expression references a key that does not exist in the con
 
 Strict mode, however, will not tolerate missing keys. If a key is referenced in an if expression but does not exist, the engine will throw a syntax error and halt the entire transformation process. You can enable strict mode using the `--strict` flag in the CLI.
 
+## Available context variables
+
+In conditions you have access to the following context variables:
+
+- `input`: The root of your input data (e.g., `${input.nested.property}`).
+- `env`: The root of your environment variables (e.g., `${env.STAGE}`).
+
+Because conditions are always evaluated first, before any loops, you cannot access loop variables like `item` or `item_index` in the condition. 

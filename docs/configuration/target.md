@@ -14,7 +14,7 @@ When Watt TF processes a target path like `resource.aws_s3_bucket.main`, it eval
 
 Because this evaluation happens dynamically in memory, you can safely write to any deep path without worrying about initializing empty parent blocks.
 
-## Dynamic Targets (String Interpolation)
+## Dynamic Targets (via Interpolation)
 
 The `target` path itself fully supports variable interpolation using the `${...}` syntax. This allows you to namespace resources dynamically based on developer input or loop variables (`item`).
 
@@ -31,6 +31,8 @@ transform:
     value:
       name: ${item}
 ```
+
+If you want to learn more about interpolation, visit the [Interpolation](./interpolation.md) section.
 
 ## Handling Special Characters (Escaping Dots)
 
