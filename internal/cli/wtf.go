@@ -5,7 +5,8 @@ import (
 )
 
 var PersistentFlags struct {
-	Verbose bool
+	Verbose   bool
+	LogFormat string
 }
 
 var persistentFlags = &PersistentFlags
@@ -19,6 +20,7 @@ from structured input files (like JSON or YAML) using a configuration file that 
 
 func init() {
 	RootCmd.PersistentFlags().BoolVar(&persistentFlags.Verbose, "verbose", false, "Enable verbose output")
+	RootCmd.PersistentFlags().StringVar(&persistentFlags.LogFormat, "log-format", "text", "Set log format ('pretty', 'text' or 'json')")
 	RootCmd.AddCommand(buildCmd)
 }
 
