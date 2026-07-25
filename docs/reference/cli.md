@@ -2,6 +2,17 @@
 
 The Watt TF command-line interface is designed for high-performance transformations and seamless integration into CI/CD pipelines.
 
+## `wtf`
+
+The global `wtf` command serves as the entry point for all Watt TF operations. It provides a unified interface for executing various subcommands, each tailored to specific tasks in the workflow.
+
+### Global Options
+
+| Option | Type | Description |
+| :--- | :--- | :--- |
+| `--verbose` | `flag` | Enables verbose output for debugging and detailed logs. |
+| `--log-format` | `string` | Sets the log format. Options: `pretty`, `text`, or `json`. Default is `pretty`. |
+
 ## `wtf build`
 
 The `build` command is the primary entry point for transforming your blueprints into Terraform JSON files.
@@ -27,7 +38,7 @@ wtf build [options]
 Previously, it was possible to pass blueprints to Watt TF using `--config` or `-c`. This is still possible, but will be removed in the next major version (v2.0.0).
 :::
 
-## Example Pipeline Integration
+## Example
 
 In a typical CI/CD scenario (like GitHub Actions or GitLab CI), you would use the following pattern to ensure your infrastructure configuration is valid before deployment:
 
@@ -37,4 +48,9 @@ wtf build \
   --input env.prod.yaml \
   --output main.tf.json \
   --schema schemas/input-schema.json
+  --log-format json
 ```
+
+::: tip
+You could also use our GitHub Action to simplify this process. Check out the [Documentation](/reference/github-action) or the [Watt TF GitHub Action Repository](https://github.com/devsebastianops/watt-tf-build-action).
+:::

@@ -157,6 +157,10 @@ const config = defineConfig({
             {
               text: "CEL Functions",
               link: "/reference/cel"
+            },
+            {
+              text: "GitHub Action",
+              link: "/reference/github-action"
             }
           ]
         }
@@ -172,7 +176,7 @@ const config = defineConfig({
 
     footer: {
       message: "Released under the MIT License.",
-      copyright: "Copyright © 2026 Sebastian Breuer"
+      copyright: "Copyright © 2026 <a target='_blank' href='https://devsebastianops.com'>Sebastian Breuer</a>"
     },
 
     editLink: {

@@ -44,9 +44,6 @@ func init() {
 }
 
 func build() error {
-
-	logger.SetUp(persistentFlags.Verbose)
-
 	logger.Debug("building project",
 		"config", buildOptions.ConfigFile,
 		"blueprint", buildOptions.BlueprintFile,
