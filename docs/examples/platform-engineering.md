@@ -81,3 +81,7 @@ done
 terraform init
 terraform apply -auto-approve
 ```
+
+::: tip
+You can use the Watt TF GitHub Action to simplify this process even further. Check out the [GitHub Action documentation](/reference/github-action) for more details or visit the [GitHub Action repository](https://github.com/devsebastianops/watt-tf-build-action) to get started.
+:::
