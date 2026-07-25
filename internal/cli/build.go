@@ -44,18 +44,6 @@ func init() {
 }
 
 func build() error {
-
-	logger.SetUp(persistentFlags.Verbose)
-	logFormatJson := persistentFlags.LogFormat == "json"
-	if logFormatJson {
-		logger.SetJSONHandler()
-	}
-
-	logFormatText := persistentFlags.LogFormat == "text"
-	if logFormatText {
-		logger.SetTextHandler()
-	}
-
 	logger.Debug("building project",
 		"config", buildOptions.ConfigFile,
 		"blueprint", buildOptions.BlueprintFile,

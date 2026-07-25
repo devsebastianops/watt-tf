@@ -8,56 +8,63 @@ import (
 )
 
 var logger *slog.Logger
+var level slog.Level = slog.LevelInfo
 
-func init() {
-	// Erstelle den Charm-Logger und konfiguriere ihn als slog.Logger
-	charmLogger := log.New(os.Stdout)
-	charmLogger.SetLevel(log.InfoLevel)
-	charmLogger.SetReportTimestamp(false) // Lässt das CLI cleaner wirken (optional)
-
-	// Charm bietet direkt einen slog-konpatiblen Handler an!
-	logger = slog.New(charmLogger)
-}
-
-func SetUp(verbose bool) {
-	if verbose {
-		SetDebug()
-	} else {
-		SetLevel(slog.LevelInfo)
-	}
-}
+const LOG_FORMAT_PRETTY = "pretty"
+const LOG_FORMAT_TEXT = "text"
+const LOG_FORMAT_JSON = "json"
 
 func Debug(msg string, args ...any) { logger.Debug(msg, args...) }
 func Info(msg string, args ...any)  { logger.Info(msg, args...) }
 func Warn(msg string, args ...any)  { logger.Warn(msg, args...) }
 func Error(msg string, args ...any) { logger.Error(msg, args...) }
 
-func SetLevel(level slog.Level) {
+func init() {
+	setPrettyHandler()
+}
+
+func SetUp(verbose bool, logFormat string) {
+	if verbose {
+		setDebug()
+	}
+
+	switch logFormat {
+	case LOG_FORMAT_PRETTY:
+		setPrettyHandler()
+	case LOG_FORMAT_TEXT:
+		setTextHandler()
+	case LOG_FORMAT_JSON:
+		setJSONHandler()
+	default:
+		setPrettyHandler()
+	}
+}
+
+func setDebug() {
+	level = slog.LevelDebug
+}
+
+func setPrettyHandler() {
 	charmLogger := log.New(os.Stdout)
 	charmLogger.SetLevel(slogLevelToCharm(level))
+	charmLogger.SetReportTimestamp(false)
 	logger = slog.New(charmLogger)
 }
 
-func SetDebug() {
-	SetLevel(slog.LevelDebug)
-}
-
-func SetJSONHandler() {
-	// Fallback oder echter JSON-Modus, falls gewünscht
+func setJSONHandler() {
 	handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: level,
 	})
 	logger = slog.New(handler)
 }
 
-func SetTextHandler() {
+func setTextHandler() {
 	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: level,
 	})
 	logger = slog.New(handler)
 }
 
-// Hilfsfunktion zum Mappen der Log-Levels
 func slogLevelToCharm(level slog.Level) log.Level {
 	switch {
 	case level <= slog.LevelDebug:
