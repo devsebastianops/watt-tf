@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	github.com/charmbracelet/log v1.0.0
-	github.com/google/cel-go v0.29.1
+	github.com/google/cel-go v0.30.0
 	github.com/spf13/cobra v1.10.2
 	github.com/xeipuuv/gojsonschema v1.2.0
 	gopkg.in/yaml.v3 v3.0.1
