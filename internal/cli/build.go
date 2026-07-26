@@ -145,7 +145,6 @@ func build() error {
 	logger.Debug("transformation completed successfully")
 
 	if buildOptions.DryRun {
-		logger.Info("Dry run completed successfully.")
 		printResult(result)
 		return nil
 	}
@@ -159,11 +158,23 @@ func build() error {
 }
 
 func printResult(result map[string]interface{}) {
-	jsonBytes, err := json.MarshalIndent(result, "", "  ")
-	if err != nil {
-		logger.Error("failed to marshal result to JSON for dry run", "error", err.Error())
-		return
-	}
+	isTextOrPretty := persistentFlags.LogFormat == "pretty" || persistentFlags.LogFormat == "text"
+	if isTextOrPretty && !persistentFlags.Silent {
+		divider := "............................................."
 
-	fmt.Println(string(jsonBytes))
+		logger.Info("Dry run completed successfully.")
+		fmt.Println("\nGenerated Terraform JSON configuration")
+		fmt.Println(divider)
+		jsonBytes, err := json.MarshalIndent(result, "", "  ")
+		if err != nil {
+			logger.Error("failed to marshal result to JSON for dry run", "error", err.Error())
+			return
+		}
+		fmt.Println(string(jsonBytes))
+		fmt.Println(divider)
+		fmt.Println("No files were written.")
+	} else {
+		// Im JSON- oder Silent-Modus geben wir es sauber über den strukturierten Logger aus
+		logger.Info("Dry run completed successfully", "generated terraform configuration", result)
+	}
 }
