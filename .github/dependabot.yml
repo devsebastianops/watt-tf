@@ -12,4 +12,4 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/.github/"
     schedule:
-      interval: "weekly
+      interval: "weekly"
