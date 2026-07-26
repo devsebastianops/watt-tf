@@ -23,8 +23,10 @@ func init() {
 	setPrettyHandler()
 }
 
-func SetUp(verbose bool, logFormat string) {
-	if verbose {
+func SetUp(verbose bool, logFormat string, silent bool) {
+	if silent {
+		setSilent()
+	} else if verbose {
 		setDebug()
 	}
 
@@ -42,6 +44,10 @@ func SetUp(verbose bool, logFormat string) {
 
 func setDebug() {
 	level = slog.LevelDebug
+}
+
+func setSilent() {
+	level = slog.LevelWarn
 }
 
 func setPrettyHandler() {

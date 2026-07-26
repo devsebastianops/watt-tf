@@ -12,6 +12,7 @@ The global `wtf` command serves as the entry point for all Watt TF operations. I
 | :--- | :--- | :--- |
 | `--verbose` | `flag` | Enables verbose output for debugging and detailed logs. |
 | `--log-format` | `string` | Sets the log format. Options: `pretty`, `text`, or `json`. Default is `pretty`. |
+| `--silent` | `flag` | Enables silent mode, suppressing all output except for errors and warnings. |
 
 ## `wtf build`
 
