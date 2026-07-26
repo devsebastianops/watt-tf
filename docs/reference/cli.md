@@ -12,6 +12,7 @@ The global `wtf` command serves as the entry point for all Watt TF operations. I
 | :--- | :--- | :--- |
 | `--verbose` | `flag` | Enables verbose output for debugging and detailed logs. |
 | `--log-format` | `string` | Sets the log format. Options: `pretty`, `text`, or `json`. Default is `pretty`. |
+| `--silent` | `flag` | Enables silent mode, suppressing all output except for errors and warnings. |
 
 ## `wtf build`
 
@@ -32,6 +33,7 @@ wtf build [options]
 | `--schema`<br> `-s` | `string` | Path/URL to a JSON Schema to validate the input file before transformation. |
 | `--strict` | `flag` | Enables strict mode (halts on missing keys or syntax errors). |
 | `--strip-nulls` | `flag` | Removes any keys with `null` values from the final output. |
+| `--dry-run` | `flag` | Performs a dry run. Prints a preview of the generated Terraform JSON configuration without writing any files. |
 | `--config`<br> `-c` | `string` | Path to a configuration file _(deprecated)_ |
 
 ::: warning Deprecation Note

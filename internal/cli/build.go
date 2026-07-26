@@ -1,6 +1,9 @@
 package cli
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/devsebastianops/watt-tf/internal/config"
 	"github.com/devsebastianops/watt-tf/internal/environment"
 	"github.com/devsebastianops/watt-tf/internal/logger"
@@ -20,6 +23,7 @@ type BuildOptions struct {
 	SchemaFile    string
 	StripNulls    bool
 	Strict        bool
+	DryRun        bool
 }
 
 var buildOptions = BuildOptions{}
@@ -41,17 +45,20 @@ func init() {
 	buildCmd.Flags().StringVarP(&buildOptions.SchemaFile, "schema", "s", "", "Path to the schema file")
 	buildCmd.Flags().BoolVar(&buildOptions.StripNulls, "strip-nulls", false, "Strip null values from the output")
 	buildCmd.Flags().BoolVar(&buildOptions.Strict, "strict", false, "Enable strict mode")
+	buildCmd.Flags().BoolVar(&buildOptions.DryRun, "dry-run", false, "Perform a dry run without writing output to file")
 }
 
 func build() error {
-	logger.Debug("building project",
+	logger.Debug("building...",
 		"config", buildOptions.ConfigFile,
 		"blueprint", buildOptions.BlueprintFile,
 		"input", buildOptions.InputFile,
 		"output", buildOptions.OutputFile,
 		"strict", buildOptions.Strict,
 		"schema", buildOptions.SchemaFile,
-		"verbose", persistentFlags.Verbose)
+		"verbose", persistentFlags.Verbose,
+		"dry_run", buildOptions.DryRun,
+	)
 
 	var loadPath string
 	// Check if user passed config file, which is deprecated
@@ -87,7 +94,7 @@ func build() error {
 
 	// Validate input against schema if provided
 	if buildOptions.SchemaFile != "" {
-		logger.Info("validating input against schema", "schema", buildOptions.SchemaFile)
+		logger.Debug("validating input against schema", "schema", buildOptions.SchemaFile)
 		validationErr := schema.ValidateInputSchema(input, buildOptions.SchemaFile)
 		if validationErr != nil {
 			return validationErr
@@ -137,10 +144,37 @@ func build() error {
 
 	logger.Debug("transformation completed successfully")
 
+	if buildOptions.DryRun {
+		printResult(result)
+		return nil
+	}
+
 	writeErr := writer.WriteJSON(result, buildOptions.OutputFile)
 	if writeErr != nil {
 		return writeErr
 	}
 
 	return nil
+}
+
+func printResult(result map[string]interface{}) {
+	isTextOrPretty := persistentFlags.LogFormat == "pretty" || persistentFlags.LogFormat == "text"
+	if isTextOrPretty && !persistentFlags.Silent {
+		divider := "............................................."
+
+		logger.Info("Dry run completed successfully.")
+		fmt.Println("\nGenerated Terraform JSON configuration")
+		fmt.Println(divider)
+		jsonBytes, err := json.MarshalIndent(result, "", "  ")
+		if err != nil {
+			logger.Error("failed to marshal result to JSON for dry run", "error", err.Error())
+			return
+		}
+		fmt.Println(string(jsonBytes))
+		fmt.Println(divider)
+		fmt.Println("No files were written.")
+	} else {
+		// Im JSON- oder Silent-Modus geben wir es sauber über den strukturierten Logger aus
+		logger.Info("Dry run completed successfully", "generated terraform configuration", result)
+	}
 }
