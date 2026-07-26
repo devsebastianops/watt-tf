@@ -33,6 +33,7 @@ wtf build [options]
 | `--schema`<br> `-s` | `string` | Path/URL to a JSON Schema to validate the input file before transformation. |
 | `--strict` | `flag` | Enables strict mode (halts on missing keys or syntax errors). |
 | `--strip-nulls` | `flag` | Removes any keys with `null` values from the final output. |
+| `--dry-run` | `flag` | Performs a dry run. Prints a preview of the generated Terraform JSON configuration without writing any files. |
 | `--config`<br> `-c` | `string` | Path to a configuration file _(deprecated)_ |
 
 ::: warning Deprecation Note
