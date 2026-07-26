@@ -15,9 +15,9 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 	result := map[string]interface{}{}
 
 	if strict {
-		logger.Info("running in strict mode: missing keys will cause errors")
+		logger.Debug("running in strict mode: missing keys will cause errors")
 	} else {
-		logger.Info("running in lenient mode: missing keys will be replaced with null")
+		logger.Debug("running in lenient mode: missing keys will be replaced with null")
 	}
 
 	baseEnv, _ := cel.NewEnv(
@@ -30,13 +30,13 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 	)
 
 	// Register custom wtf functions
-	logger.Info("registering custom wtf functions")
+	logger.Debug("registering custom wtf functions")
 	env, err := RegisterWtfFunctions(baseEnv)
 	if err != nil {
 		logger.Error("failed to register wtf functions", "error", err.Error())
 		return nil, fmt.Errorf("failed to register wtf functions: %w", err)
 	}
-	logger.Info("custom wtf functions registered successfully")
+	logger.Debug("custom wtf functions registered successfully")
 
 	for _, transformable := range transformables {
 		target := transformable.Target
