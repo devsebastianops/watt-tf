@@ -31,7 +31,7 @@ jobs:
 
       - name: Extract Metadata (Tags, Labels) for Docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/watt-tf
           tags: |
