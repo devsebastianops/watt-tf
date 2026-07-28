@@ -7,6 +7,7 @@ import (
 	"github.com/devsebastianops/watt-tf/internal/config"
 	"github.com/devsebastianops/watt-tf/internal/logger"
 	"github.com/google/cel-go/cel"
+	"github.com/google/cel-go/ext"
 )
 
 func Transform(input map[string]interface{}, envVars map[string]string, config *config.Config, strict bool) (map[string]interface{}, error) {
@@ -27,6 +28,11 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 		cel.Variable("item_index", cel.IntType),
 		cel.Macros(cel.StandardMacros...),
 		cel.OptionalTypes(),
+		ext.Encoders(),
+		ext.Lists(),
+		ext.Strings(),
+		ext.Sets(),
+		ext.Regex(),
 	)
 
 	// Register custom wtf functions
