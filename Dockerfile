@@ -2,7 +2,7 @@ ARG BUILD_TIMESTAMP
 ARG BUILD_COMMIT
 ARG BUILD_VERSION
 
-FROM golang:1.25-alpine AS build
+FROM golang:1.26-alpine AS build
 WORKDIR /app
 COPY . .
 RUN go build -o bin/wtf -ldflags "-X github.com/devsebastianops/watt-tf/internal/cli.Version=${BUILD_VERSION} \
