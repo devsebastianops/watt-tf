@@ -1,6 +1,6 @@
 module github.com/devsebastianops/watt-tf
 
-go 1.25.1
+go 1.26.5
 
 require (
 	github.com/charmbracelet/log v1.0.0
