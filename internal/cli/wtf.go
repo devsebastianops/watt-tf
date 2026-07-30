@@ -5,6 +5,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	Version   = "development"
+	Commit    = "none"
+	BuildTime = int64(0)
+)
+
 var PersistentFlags struct {
 	Verbose   bool
 	LogFormat string
@@ -12,6 +18,12 @@ var PersistentFlags struct {
 }
 
 var persistentFlags = &PersistentFlags
+
+var RootFlags struct {
+	Version bool
+}
+
+var rootFlags = &RootFlags
 
 var RootCmd = &cobra.Command{
 	Use:   "wtf",
@@ -25,9 +37,17 @@ from structured input files (like JSON or YAML) using a configuration file that 
 		}
 		logger.SetUp(persistentFlags.Verbose, persistentFlags.LogFormat, persistentFlags.Silent)
 	},
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if rootFlags.Version {
+			logger.Infof("wtf version %s (commit: %s, build time: %d)", Version, Commit, BuildTime)
+		}
+		return nil
+	},
 }
 
 func init() {
+	RootCmd.Flags().BoolVar(&rootFlags.Version, "version", false, "Show the version of wtf")
+
 	RootCmd.PersistentFlags().BoolVar(&persistentFlags.Verbose, "verbose", false, "Enable verbose output")
 	RootCmd.PersistentFlags().StringVar(&persistentFlags.LogFormat, "log-format", "pretty", "Set log format ('pretty', 'text' or 'json')")
 	RootCmd.PersistentFlags().BoolVar(&persistentFlags.Silent, "silent", false, "Enable silent mode")
