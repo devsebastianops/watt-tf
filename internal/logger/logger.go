@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -18,6 +19,13 @@ func Debug(msg string, args ...any) { logger.Debug(msg, args...) }
 func Info(msg string, args ...any)  { logger.Info(msg, args...) }
 func Warn(msg string, args ...any)  { logger.Warn(msg, args...) }
 func Error(msg string, args ...any) { logger.Error(msg, args...) }
+func Fatal(msg string, args ...any) { logger.Error(msg, args...); os.Exit(1) }
+
+func Debugf(format string, args ...any) { logger.Debug(fmt.Sprintf(format, args...)) }
+func Infof(format string, args ...any)  { logger.Info(fmt.Sprintf(format, args...)) }
+func Warnf(format string, args ...any)  { logger.Warn(fmt.Sprintf(format, args...)) }
+func Errorf(format string, args ...any) { logger.Error(fmt.Sprintf(format, args...)) }
+func Fatalf(format string, args ...any) { logger.Error(fmt.Sprintf(format, args...)); os.Exit(1) }
 
 func init() {
 	setPrettyHandler()

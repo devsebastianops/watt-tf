@@ -10,8 +10,21 @@ on:
     types: [published]
 
 jobs:
+  timestamp:
+    name: Get Release Timestamp
+    runs-on: ubuntu-latest
+    outputs:
+      timestamp: ${{ steps.get_timestamp.outputs.timestamp }}
+    steps:
+      - name: Get release timestamp
+        id: get_timestamp
+        run: echo "timestamp=$(date -d "${{ github.event.release.published_at }}" +%s)" >> $GITHUB_OUTPUT
+
   docker:
     name: Release Docker
+    needs: timestamp
+    env: 
+      BUILD_TIMESTAMP: ${{ needs.timestamp.outputs.timestamp }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -54,10 +67,15 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BUILD_TIMESTAMP=${{ needs.timestamp.outputs.timestamp }}
+            BUILD_COMMIT=${{ github.sha }}
+            BUILD_VERSION=${{ github.event.release.tag_name }}
 
   go:
     name: Release Go Binaries
     runs-on: ubuntu-latest
+    needs: timestamp
     strategy:
       matrix:
         goos: [linux, windows, darwin]
@@ -89,7 +107,15 @@ jobs:
 
         echo "binary_name=$BINARY_NAME" >> "$GITHUB_OUTPUT"
 
-        CGO_ENABLED=0 GOOS="${{ matrix.goos }}" GOARCH="${{ matrix.goarch }}" go build -ldflags="-s -w" -o "$BINARY_NAME" ./cmd/wtf/main.go
+        export CGO_ENABLED=0
+        export GOOS="${{ matrix.goos }}"
+        export GOARCH="${{ matrix.goarch }}"
+
+        go build -ldflags="-s -w \
+          -X github.com/devsebastianops/watt-tf/internal/cli.Version=${{ steps.get_version.outputs.VERSION }} \
+          -X github.com/devsebastianops/watt-tf/internal/cli.Commit=${{ github.sha }} \
+          -X github.com/devsebastianops/watt-tf/internal/cli.BuildTime=${{ needs.timestamp.outputs.timestamp }}" \
+          -o "$BINARY_NAME" ./cmd/wtf/main.go
 
     - name: Package binary
       id: package
