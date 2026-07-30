@@ -8,7 +8,7 @@ import (
 var (
 	Version   = "development"
 	Commit    = "none"
-	BuildTime = int64(0)
+	BuildTime = "2026-01-01T00:00:00Z"
 )
 
 var PersistentFlags struct {
@@ -39,7 +39,7 @@ from structured input files (like JSON or YAML) using a configuration file that 
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if rootFlags.Version {
-			logger.Infof("wtf version %s (commit: %s, build time: %d)", Version, Commit, BuildTime)
+			logger.Infof("wtf version %s (commit: %s, build time: %s)", Version, Commit, BuildTime)
 		}
 		return nil
 	},
