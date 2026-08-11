@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/devsebastianops/watt-tf/internal/logger"
+	"github.com/devsebastianops/x/logger"
 )
 
 type DispatchConfig struct {

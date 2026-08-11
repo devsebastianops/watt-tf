@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/devsebastianops/watt-tf/internal/parser"
 	p "github.com/devsebastianops/watt-tf/internal/plugin"
+	"github.com/devsebastianops/x/parser"
 )
 
 func LoadConfig(filePath string) (*Config, error) {
@@ -14,7 +14,7 @@ func LoadConfig(filePath string) (*Config, error) {
 	}
 
 	// Load the main config file
-	configMap, err := parser.ParseYAML(filePath)
+	configMap, err := parser.ParseInput(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func LoadConfig(filePath string) (*Config, error) {
 
 // loadConfigWithoutIncludes loads a single config file without processing includes
 func loadConfigWithoutIncludes(filePath string) (*Config, error) {
-	configMap, err := parser.ParseYAML(filePath)
+	configMap, err := parser.ParseInput(filePath)
 	if err != nil {
 		return nil, err
 	}
