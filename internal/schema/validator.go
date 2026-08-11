@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/devsebastianops/watt-tf/internal/logger"
+	"github.com/devsebastianops/x/logger"
 	"github.com/xeipuuv/gojsonschema"
 )
 

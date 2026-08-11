@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/devsebastianops/watt-tf/internal/logger"
+	"github.com/devsebastianops/x/logger"
 )
 
 // WriteJSON writes the result map to a JSON file

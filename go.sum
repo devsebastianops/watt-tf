@@ -20,6 +20,10 @@ github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6N
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/devsebastianops/x/logger v1.0.0 h1:ctP7fsx8jN0zlrJmIRXLjmRkmxeg2KbD21uCRgRxAmM=
+github.com/devsebastianops/x/logger v1.0.0/go.mod h1:BQrieLVfBYprklySrkQKZdR1mPK9LAx0W+4UiaoYbP8=
+github.com/devsebastianops/x/parser v1.0.0 h1:+3oyNrgyaai/e9di0LosjH/jcxrBmmckq2Dyl3TGE8M=
+github.com/devsebastianops/x/parser v1.0.0/go.mod h1:urveTOk9Ku2Y8nAKQEY52xfrrnI2GSS4zoMr1V6If5c=
 github.com/go-logfmt/logfmt v0.6.1 h1:4hvbpePJKnIzH1B+8OR/JPbTx37NktoI9LE2QZBBkvE=
 github.com/go-logfmt/logfmt v0.6.1/go.mod h1:EV2pOAQoZaT1ZXZbqDl5hrymndi4SY9ED9/z6CO0XAk=
 github.com/google/cel-go v0.30.0 h1:ll54AkzKunWkBn9wSoiUXbFZXYZTkdJGNXTBXUoolGo=

@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/devsebastianops/watt-tf/internal/config"
-	"github.com/devsebastianops/watt-tf/internal/parser"
 	"github.com/devsebastianops/watt-tf/internal/plugin"
 	"github.com/devsebastianops/watt-tf/internal/transformer"
+	"github.com/devsebastianops/x/parser"
 )
 
 // TestE2EExamples runs end-to-end tests for all examples

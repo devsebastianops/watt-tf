@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/devsebastianops/watt-tf/internal/cli"
-	"github.com/devsebastianops/watt-tf/internal/logger"
+	"github.com/devsebastianops/x/logger"
 )
 
 func main() {

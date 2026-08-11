@@ -6,12 +6,12 @@ import (
 
 	"github.com/devsebastianops/watt-tf/internal/config"
 	"github.com/devsebastianops/watt-tf/internal/environment"
-	"github.com/devsebastianops/watt-tf/internal/logger"
-	"github.com/devsebastianops/watt-tf/internal/parser"
 	"github.com/devsebastianops/watt-tf/internal/plugin"
 	"github.com/devsebastianops/watt-tf/internal/schema"
 	"github.com/devsebastianops/watt-tf/internal/transformer"
 	"github.com/devsebastianops/watt-tf/internal/writer"
+	"github.com/devsebastianops/x/logger"
+	"github.com/devsebastianops/x/parser"
 	"github.com/spf13/cobra"
 )
 
