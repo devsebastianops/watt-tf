@@ -5,7 +5,7 @@ go 1.26.5
 require (
 	github.com/devsebastianops/x/logger v1.0.0
 	github.com/devsebastianops/x/parser v1.0.0
-	github.com/google/cel-go v0.30.0
+	github.com/google/cel-go v0.31.0
 	github.com/spf13/cobra v1.10.2
 	github.com/xeipuuv/gojsonschema v1.2.0
 )
