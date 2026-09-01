@@ -19,6 +19,19 @@ func isMissingKeyError(err error) bool {
 		strings.Contains(errMsg, "undefined reference")
 }
 
+func isTerraformReference(expr string) bool {
+	// https://developer.hashicorp.com/terraform/language/expressions/references
+	for _, prefix := range []string{
+		"var.", "module.", "local.", "resource.", "data.", "terraform.",
+		"path.", "each.", "count.", "self.",
+	} {
+		if strings.HasPrefix(expr, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
 func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[string]string, strict bool) (any, error) {
 	// Check the type of val and handle accordingly
 	switch v := val.(type) {
@@ -33,6 +46,9 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 
 		// There is only one match and the whole string is the interpolation, we can evaluate it directly
 		if len(matches) == 1 && matches[0].Start == 0 && matches[0].End == len(v) {
+			if isTerraformReference(matches[0].Expr) {
+				return v, nil
+			}
 			return evalCelExpression(matches[0].Expr, env, inputData, envVars, strict)
 		}
 
@@ -41,6 +57,9 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 		for _, match := range matches {
 			fullMatch := v[match.Start:match.End] // ${input.env}
 			expression := match.Expr              // input.env
+			if isTerraformReference(expression) {
+				continue
+			}
 
 			celVal, err := evalCelExpression(expression, env, inputData, envVars, strict)
 			if err != nil {
@@ -152,6 +171,9 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 
 		matches := findInterpolations(v)
 		if len(matches) == 1 && matches[0].Start == 0 && matches[0].End == len(v) {
+			if isTerraformReference(matches[0].Expr) {
+				return v, nil
+			}
 			return evalCelExpressionWithItem(matches[0].Expr, env, inputData, envVars, item, itemIndex, strict)
 		}
 
@@ -159,6 +181,9 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 		for _, match := range matches {
 			fullMatch := v[match.Start:match.End]
 			expression := match.Expr
+			if isTerraformReference(expression) {
+				continue
+			}
 
 			celVal, err := evalCelExpressionWithItem(expression, env, inputData, envVars, item, itemIndex, strict)
 			if err != nil {
