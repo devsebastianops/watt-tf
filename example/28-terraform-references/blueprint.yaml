@@ -1,0 +1,9 @@
+transform:
+  - target: resource.aws_instance.example
+    value:
+      ami: ${var.ami}
+      name: ${input.name}
+      instance_type: ${input.instance_type}
+  
+
+  
