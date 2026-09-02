@@ -1,0 +1,12 @@
+transform:
+  - target: module.${input.name}_network
+    value:
+      source: "git::github.com/acme/network.git//network?ref=main"
+      cidr: "${input.network.ip}/${input.network.size}"
+      region: "${var.region}"
+  - target: module.${input.name}_cloudrun
+    value:
+      source: "git::github.com/acme/cloudrun.git//cloudrun?ref=main"
+      image: "${input.cloudrun.image}"
+      port: "${input.cloudrun.port}"
+      network: "${module.${input.name}_network.network}"

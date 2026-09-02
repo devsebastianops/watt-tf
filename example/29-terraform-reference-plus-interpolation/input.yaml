@@ -1,0 +1,8 @@
+name: example
+network:
+  ip: 10.10.0.0
+  size: 24
+cloudrun:
+  image: gcr.io/my-project/example:latest
+  port: 8080
+  

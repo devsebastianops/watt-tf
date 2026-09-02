@@ -46,9 +46,6 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 
 		// There is only one match and the whole string is the interpolation, we can evaluate it directly
 		if len(matches) == 1 && matches[0].Start == 0 && matches[0].End == len(v) {
-			if isTerraformReference(matches[0].Expr) {
-				return v, nil
-			}
 			return evalCelExpression(matches[0].Expr, env, inputData, envVars, strict)
 		}
 
@@ -57,9 +54,6 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 		for _, match := range matches {
 			fullMatch := v[match.Start:match.End] // ${input.env}
 			expression := match.Expr              // input.env
-			if isTerraformReference(expression) {
-				continue
-			}
 
 			celVal, err := evalCelExpression(expression, env, inputData, envVars, strict)
 			if err != nil {
@@ -119,6 +113,14 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 }
 
 func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string, strict bool) (any, error) {
+	if isTerraformReference(expr) {
+		interpolatedExpr, err := interpolate(expr, env, inputData, envVars, strict)
+		if err != nil {
+			return nil, err
+		}
+		return "${" + fmt.Sprintf("%v", interpolatedExpr) + "}", nil
+	}
+
 	ast, iss := env.Compile(expr)
 	if iss.Err() != nil {
 		return nil, fmt.Errorf("syntax error in interpolation '%s': %v", expr, iss.Err())
@@ -171,9 +173,6 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 
 		matches := findInterpolations(v)
 		if len(matches) == 1 && matches[0].Start == 0 && matches[0].End == len(v) {
-			if isTerraformReference(matches[0].Expr) {
-				return v, nil
-			}
 			return evalCelExpressionWithItem(matches[0].Expr, env, inputData, envVars, item, itemIndex, strict)
 		}
 
@@ -181,9 +180,6 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 		for _, match := range matches {
 			fullMatch := v[match.Start:match.End]
 			expression := match.Expr
-			if isTerraformReference(expression) {
-				continue
-			}
 
 			celVal, err := evalCelExpressionWithItem(expression, env, inputData, envVars, item, itemIndex, strict)
 			if err != nil {
@@ -238,6 +234,14 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 }
 
 func evalCelExpressionWithItem(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string, item any, itemIndex int, strict bool) (any, error) {
+	if isTerraformReference(expr) {
+		interpolatedExpr, err := interpolateWithItem(expr, env, inputData, envVars, item, itemIndex, strict)
+		if err != nil {
+			return nil, err
+		}
+		return "${" + fmt.Sprintf("%v", interpolatedExpr) + "}", nil
+	}
+
 	ast, iss := env.Compile(expr)
 	if iss.Err() != nil {
 		return nil, fmt.Errorf("syntax error in interpolation '%s': %v", expr, iss.Err())
