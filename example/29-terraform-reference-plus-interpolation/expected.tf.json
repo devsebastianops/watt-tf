@@ -1,0 +1,15 @@
+{
+    "module": {
+        "example_network": {
+            "source": "git::github.com/acme/network.git//network?ref=main",
+            "cidr": "10.10.0.0/24",
+            "region": "${var.region}"
+        },
+        "example_cloudrun": {
+            "source": "git::github.com/acme/cloudrun.git//cloudrun?ref=main",
+            "image": "gcr.io/my-project/example:latest",
+            "port": 8080,
+            "network": "${module.example_network.network}"
+        }
+    }
+}
