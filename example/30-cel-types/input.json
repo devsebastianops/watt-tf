@@ -1,0 +1,16 @@
+{
+    "name": "orders",
+    "port": 8080,
+    "isProduction": true,
+    "routes": [
+        "/health",
+        "/orders",
+        "/order/{id}"
+    ],
+    "owner": {
+        "name": "John Doe",
+        "number": 12229,
+        "team": "Backend",
+        "email": "john.doe@example.com"
+    }
+}

@@ -1,0 +1,20 @@
+{
+  "module": {
+    "microservice": {
+      "isProduction": true,
+      "name": "orders",
+      "owner": {
+        "email": "john.doe@example.com",
+        "name": "John Doe",
+        "number": 12229,
+        "team": "Backend"
+      },
+      "port": 8080,
+      "routes": [
+        "/health",
+        "/orders",
+        "/order/{id}"
+      ]
+    }
+  }
+}
