@@ -39,5 +39,6 @@ In conditions you have access to the following context variables:
 
 - `input`: The root of your input data (e.g., `${input.nested.property}`).
 - `env`: The root of your environment variables (e.g., `${env.STAGE}`).
+- `vars`: The root of your defined precomputed `variables` defined in your blueprint ( e.g. `${vars.name})
 
-Because conditions are always evaluated first, before any loops, you cannot access loop variables like `item` or `item_index` in the condition. 
+Because conditions are always evaluated before any loops, you cannot access loop variables like `item` or `item_index` in the condition. 

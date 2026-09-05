@@ -11,6 +11,8 @@ import (
 func LoadConfig(filePath string) (*Config, error) {
 	config := &Config{
 		Transform: []Transformable{},
+		Plugins:   []p.Plugin{},
+		Variables: map[string]any{},
 	}
 
 	// Load the main config file
@@ -41,6 +43,8 @@ func LoadConfig(filePath string) (*Config, error) {
 				config.Transform = append(config.Transform, includedConfig.Transform...)
 				// Append plugins from included config
 				config.Plugins = append(config.Plugins, includedConfig.Plugins...)
+				// Append variables from included config
+				config.Variables = mergeMaps(config.Variables, includedConfig.Variables)
 			}
 		}
 	}
@@ -55,6 +59,8 @@ func LoadConfig(filePath string) (*Config, error) {
 	config.Transform = append(config.Transform, mainConfig.Transform...)
 	// Append main config plugins
 	config.Plugins = append(config.Plugins, mainConfig.Plugins...)
+	// Append main config variables
+	config.Variables = mergeMaps(config.Variables, mainConfig.Variables)
 
 	return config, nil
 }
@@ -69,17 +75,23 @@ func loadConfigWithoutIncludes(filePath string) (*Config, error) {
 	config := &Config{
 		Transform: []Transformable{},
 		Plugins:   []p.Plugin{},
+		Variables: map[string]any{},
+	}
+
+	// Parse variables if present
+	if variables, ok := configMap["variables"].(map[string]any); ok {
+		config.Variables = variables
 	}
 
 	// Parse transforms
-	transformList, ok := configMap["transform"].([]interface{})
+	transformList, ok := configMap["transform"].([]any)
 	if !ok {
 		// If no transform list, return empty config
 		return config, nil
 	}
 
 	for _, transformable := range transformList {
-		transformableMap, ok := transformable.(map[string]interface{})
+		transformableMap, ok := transformable.(map[string]any)
 		if !ok {
 			return nil, fmt.Errorf("invalid transform entry")
 		}
@@ -115,10 +127,10 @@ func loadConfigWithoutIncludes(filePath string) (*Config, error) {
 	}
 
 	// Parse plugins
-	pluginList, ok := configMap["plugins"].([]interface{})
+	pluginList, ok := configMap["plugins"].([]any)
 	if ok {
 		for _, plugin := range pluginList {
-			pluginMap, ok := plugin.(map[string]interface{})
+			pluginMap, ok := plugin.(map[string]any)
 			if !ok {
 				return nil, fmt.Errorf("invalid plugin entry")
 			}
@@ -143,7 +155,7 @@ func loadConfigWithoutIncludes(filePath string) (*Config, error) {
 				return nil, fmt.Errorf("missing or invalid 'version' field in plugin '%s'", name)
 			}
 
-			argsInterface, _ := pluginMap["args"].([]interface{})
+			argsInterface, _ := pluginMap["args"].([]any)
 			args := []string{}
 			for _, arg := range argsInterface {
 				if argStr, ok := arg.(string); ok {
@@ -164,4 +176,14 @@ func loadConfigWithoutIncludes(filePath string) (*Config, error) {
 	}
 
 	return config, nil
+}
+
+func mergeMaps(dest, src map[string]any) map[string]any {
+	if dest == nil {
+		dest = make(map[string]any)
+	}
+	for k, v := range src {
+		dest[k] = v
+	}
+	return dest
 }

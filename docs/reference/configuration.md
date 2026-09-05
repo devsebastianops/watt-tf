@@ -6,6 +6,7 @@ The Watt TF blueprint file (typically `blueprint.yaml`) is the core definition o
 
 | Key | Type | Description |
 | :--- | :--- | :--- |
+| `variables` | `map` | A map of variables for use in interpolations and CEL expressions |
 | `plugins` | `array` | A list of external plugins to hook into the transformation lifecycle. |
 | `transform` | `array` | The sequence of transformation rules applied to your resources. |
 | `include` | `array` | A list of other blueprint files to include and process as part of this blueprint. |

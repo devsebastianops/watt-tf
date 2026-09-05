@@ -59,6 +59,7 @@ Watt TF uses a lightweight syntax `${...}` to dynamically inject values. You can
 
 - `${input}`: Accesses the root of your input file (e.g., `${input.nested.property}`).
 - `${env}`: Accesses environment variables of the running system (e.g., `${env.STAGE}`). Useful for injecting workspace or credential details on the fly.
+- `${vars}`: Access precomputed vars of your `variables` block of your blueprints.
 
 Because the evaluation happens in Go memory, it is deterministic, lightning-fast, and happens before Terraform is ever invoked.
 
