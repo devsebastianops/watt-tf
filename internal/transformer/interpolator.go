@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/devsebastianops/watt-tf/internal/config"
 	"github.com/devsebastianops/x/logger"
 	"github.com/google/cel-go/cel"
 )
@@ -32,7 +33,7 @@ func isTerraformReference(expr string) bool {
 	return false
 }
 
-func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[string]string, strict bool) (any, error) {
+func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[string]string, strict bool, config *config.Config) (any, error) {
 	// Check the type of val and handle accordingly
 	switch v := val.(type) {
 
@@ -46,7 +47,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 
 		// There is only one match and the whole string is the interpolation, we can evaluate it directly
 		if len(matches) == 1 && matches[0].Start == 0 && matches[0].End == len(v) {
-			return evalCelExpression(matches[0].Expr, env, inputData, envVars, strict)
+			return evalCelExpression(matches[0].Expr, env, inputData, envVars, strict, config)
 		}
 
 		// There are multiple matches or the interpolation is part of a larger string, we need to replace them
@@ -55,7 +56,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 			fullMatch := v[match.Start:match.End] // ${input.env}
 			expression := match.Expr              // input.env
 
-			celVal, err := evalCelExpression(expression, env, inputData, envVars, strict)
+			celVal, err := evalCelExpression(expression, env, inputData, envVars, strict, config)
 			if err != nil {
 				return nil, err
 			}
@@ -81,7 +82,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 				continue
 			}
 
-			interpItem, err := interpolate(item, env, inputData, envVars, strict)
+			interpItem, err := interpolate(item, env, inputData, envVars, strict, config)
 			if err != nil {
 				return nil, err
 			}
@@ -99,7 +100,7 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 				continue
 			}
 
-			interpItem, err := interpolate(item, env, inputData, envVars, strict)
+			interpItem, err := interpolate(item, env, inputData, envVars, strict, config)
 			if err != nil {
 				return nil, err
 			}
@@ -112,9 +113,9 @@ func interpolate(val any, env *cel.Env, inputData map[string]any, envVars map[st
 	}
 }
 
-func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string, strict bool) (any, error) {
+func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string, strict bool, config *config.Config) (any, error) {
 	if isTerraformReference(expr) {
-		interpolatedExpr, err := interpolate(expr, env, inputData, envVars, strict)
+		interpolatedExpr, err := interpolate(expr, env, inputData, envVars, strict, config)
 		if err != nil {
 			return nil, err
 		}
@@ -129,7 +130,7 @@ func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envV
 	if err != nil {
 		return nil, err
 	}
-	out, _, err := program.Eval(map[string]any{"input": inputData, "env": envVars})
+	out, _, err := program.Eval(map[string]any{"input": inputData, "env": envVars, "vars": config.Variables})
 	if err != nil {
 		// Handle missing key errors based on strict mode
 		if isMissingKeyError(err) {
@@ -162,7 +163,7 @@ func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envV
 }
 
 // interpolateWithItem is like interpolate but also includes item and item_index variables
-func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVars map[string]string, item any, itemIndex int, strict bool) (any, error) {
+func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVars map[string]string, item any, itemIndex int, strict bool, config *config.Config) (any, error) {
 	switch v := val.(type) {
 
 	case string:
@@ -173,7 +174,7 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 
 		matches := findInterpolations(v)
 		if len(matches) == 1 && matches[0].Start == 0 && matches[0].End == len(v) {
-			return evalCelExpressionWithItem(matches[0].Expr, env, inputData, envVars, item, itemIndex, strict)
+			return evalCelExpressionWithItem(matches[0].Expr, env, inputData, envVars, item, itemIndex, strict, config)
 		}
 
 		resultStr := v
@@ -181,7 +182,7 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 			fullMatch := v[match.Start:match.End]
 			expression := match.Expr
 
-			celVal, err := evalCelExpressionWithItem(expression, env, inputData, envVars, item, itemIndex, strict)
+			celVal, err := evalCelExpressionWithItem(expression, env, inputData, envVars, item, itemIndex, strict, config)
 			if err != nil {
 				return nil, err
 			}
@@ -204,7 +205,7 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 				continue
 			}
 
-			interpItem, err := interpolateWithItem(mapItem, env, inputData, envVars, item, itemIndex, strict)
+			interpItem, err := interpolateWithItem(mapItem, env, inputData, envVars, item, itemIndex, strict, config)
 			if err != nil {
 				return nil, err
 			}
@@ -220,7 +221,7 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 				continue
 			}
 
-			interpItem, err := interpolateWithItem(arrayItem, env, inputData, envVars, item, itemIndex, strict)
+			interpItem, err := interpolateWithItem(arrayItem, env, inputData, envVars, item, itemIndex, strict, config)
 			if err != nil {
 				return nil, err
 			}
@@ -233,9 +234,9 @@ func interpolateWithItem(val any, env *cel.Env, inputData map[string]any, envVar
 	}
 }
 
-func evalCelExpressionWithItem(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string, item any, itemIndex int, strict bool) (any, error) {
+func evalCelExpressionWithItem(expr string, env *cel.Env, inputData map[string]any, envVars map[string]string, item any, itemIndex int, strict bool, config *config.Config) (any, error) {
 	if isTerraformReference(expr) {
-		interpolatedExpr, err := interpolateWithItem(expr, env, inputData, envVars, item, itemIndex, strict)
+		interpolatedExpr, err := interpolateWithItem(expr, env, inputData, envVars, item, itemIndex, strict, config)
 		if err != nil {
 			return nil, err
 		}
@@ -255,6 +256,7 @@ func evalCelExpressionWithItem(expr string, env *cel.Env, inputData map[string]a
 		"env":        envVars,
 		"item":       item,
 		"item_index": itemIndex,
+		"vars":       config.Variables,
 	})
 	if err != nil {
 		// Handle missing key errors based on strict mode

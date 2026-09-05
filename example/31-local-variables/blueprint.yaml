@@ -1,0 +1,15 @@
+variables:
+  name: "${input.name}"
+  port: "${has(input.port) ? input.port : 8080}"
+  isProduction: "${has(input.isProduction) ? input.isProduction : false}"
+  routes: "${has(input.routes) ? input.routes : []}"
+  owner: "${has(input.owner) ? input.owner : {}}"
+
+transform:
+- target: module.microservice-${vars.name}
+  value:
+    name: "${vars.name}"
+    port: "${vars.port}"
+    isProduction: "${vars.isProduction}"
+    routes: "${vars.routes}"
+    owner: "${vars.owner}"

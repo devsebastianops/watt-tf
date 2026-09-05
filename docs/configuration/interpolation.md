@@ -10,6 +10,7 @@ Every expression evaluated by the engine has access to the following top-level c
 - `env`: A map of all available environment variables.
 - `item`: The current element when iterating via for_each (otherwise null).
 - `item_index`: The 0-based index of the current element when iterating via for_each.
+- `vars`: Access precomputed vars of your `variables` configuration.
 
 ## Basic String Interpolation
 

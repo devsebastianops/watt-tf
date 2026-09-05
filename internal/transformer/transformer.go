@@ -26,6 +26,7 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 		cel.Variable("env", cel.MapType(cel.StringType, cel.StringType)),
 		cel.Variable("item", cel.AnyType),
 		cel.Variable("item_index", cel.IntType),
+		cel.Variable("vars", cel.MapType(cel.StringType, cel.AnyType)),
 		cel.Macros(cel.StandardMacros...),
 		cel.OptionalTypes(),
 		ext.Encoders(),
@@ -50,11 +51,23 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 		condition := transformable.If
 		forEach := transformable.ForEach
 
+		// Variables should be filled beforehands, to ensure all following interpolations
+		// have access to the variables and their values.
+		if len(config.Variables) > 0 {
+			for varName, varValue := range config.Variables {
+				interpolatedVar, err := interpolateWithItem(varValue, env, input, envVars, nil, 0, strict, config)
+				if err != nil {
+					return nil, fmt.Errorf("failed to interpolate variable '%s': %w", varName, err)
+				}
+				config.Variables[varName] = interpolatedVar
+			}
+		}
+
 		// Conditions must be evaluated before interpolation to avoid unnecessary computation
 		// and to ensure that we don't interpolate values that won't be used.
 		if condition != "" {
 			logger.Debug("evaluating condition", "target", target, "condition", condition)
-			shouldExecute, err := evalCelCondition(condition, env, input, envVars, strict)
+			shouldExecute, err := evalCelCondition(condition, env, input, envVars, strict, config)
 			if err != nil {
 				return nil, fmt.Errorf("failed to evaluate condition '%s': %w", condition, err)
 			}
@@ -85,6 +98,7 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 				"env":        envVars,
 				"item":       nil,
 				"item_index": 0,
+				"vars":       config.Variables,
 			})
 			if err != nil {
 				return nil, fmt.Errorf("failed to evaluate for_each expression '%s': %w", forEach, err)
@@ -106,14 +120,14 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 				logger.Debug("processing for_each item", "index", idx, "item_type", fmt.Sprintf("%T", item))
 
 				// Interpolate target with item context
-				interpolatedTarget, err := interpolateWithItem(target, env, input, envVars, item, idx, strict)
+				interpolatedTarget, err := interpolateWithItem(target, env, input, envVars, item, idx, strict, config)
 				if err != nil {
 					return nil, fmt.Errorf("failed to interpolate target '%s' for item %d: %w", target, idx, err)
 				}
 				targetStr := interpolatedTarget.(string)
 
 				// Interpolate value with item context
-				interpolatedValue, err := interpolateWithItem(value, env, input, envVars, item, idx, strict)
+				interpolatedValue, err := interpolateWithItem(value, env, input, envVars, item, idx, strict, config)
 				if err != nil {
 					return nil, fmt.Errorf("failed to interpolate value for item %d: %w", idx, err)
 				}
@@ -127,7 +141,7 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 		} else {
 			// Standard transformation (no for_each)
 			// 1. Interpolate target (supports dynamic names like: resource.aws_s3.${input.name})
-			interpolatedTarget, err := interpolate(target, env, input, envVars, strict)
+			interpolatedTarget, err := interpolate(target, env, input, envVars, strict, config)
 			if err != nil {
 				return nil, fmt.Errorf("failed to interpolate target '%s': %w", target, err)
 			}
@@ -136,7 +150,7 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 			logger.Debug("processing transformation", "target", target, "has_condition", condition != "")
 
 			// 2. Interpolate
-			interpolatedValue, err := interpolate(value, env, input, envVars, strict)
+			interpolatedValue, err := interpolate(value, env, input, envVars, strict, config)
 			if err != nil {
 				return nil, err
 			}
