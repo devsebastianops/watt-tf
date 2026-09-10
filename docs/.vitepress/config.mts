@@ -34,7 +34,7 @@ const config = defineConfig({
         link: "/configuration/overview"
       },
       {
-        text: "Examples",
+        text: "Examples and How-Tos",
         link: "/examples/overview"
       },
       {
@@ -120,7 +120,7 @@ const config = defineConfig({
 
       "/examples/": [
         {
-          text: "Examples",
+          text: "Examples and How-Tos",
           items: [
             {
               text: "Overview",
@@ -137,6 +137,70 @@ const config = defineConfig({
             {
               text: "Platform Engineering",
               link: "/examples/platform-engineering"
+            },
+            {
+              text: "Dynamic Targets",
+              link: "/examples/dynamic-targets"
+            },
+            {
+              text: "Deep Merging",
+              link: "/examples/deep-merging"
+            },
+            {
+              text: "Nested Targets",
+              link: "/examples/nested-paths"
+            },
+            {
+              text: "Preserve Types",
+              link: "/examples/preserve-types"
+            },
+            {
+              text: "List Values",
+              link: "/examples/list-values"
+            },
+            {
+              text: "Environment Variables",
+              link: "/examples/environment-variables"
+            },
+            {
+              text: "Includes",
+              link: "/examples/includes"
+            },
+            {
+              text: "Escaping Targets",
+              link: "/examples/escaping-targets"
+            },
+            {
+              text: "Terraform References",
+              link: "/examples/terraform-references"
+            },
+            {
+              text: "Loading External Data",
+              link: "/examples/loading-external-data"
+            },
+            {
+              text: "Reoccuring Variables",
+              link: "/examples/reoccuring-variables"
+            },
+            {
+              text: "Optional Values",
+              link: "/examples/optional-values"
+            },
+            {
+              text: "Conditional Values",
+              link: "/examples/conditional-values"
+            },
+            {
+              text: "Loops",
+              link: "/examples/loops"
+            },
+            {
+              text: "Functions",
+              link: "/examples/functions"
+            },
+            {
+              text: "Plugins",
+              link: "/examples/plugins"
             }
           ]
         }
