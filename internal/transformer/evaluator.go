@@ -34,6 +34,7 @@ func evalCelCondition(expr string, env *cel.Env, inputData map[string]any, envVa
 		"item":       nil,
 		"item_index": 0,
 		"vars":       config.Variables,
+		"data":       config.LoadedData,
 	})
 	if err != nil {
 		// Handle missing key errors based on strict mode

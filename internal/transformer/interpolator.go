@@ -23,7 +23,7 @@ func isMissingKeyError(err error) bool {
 func isTerraformReference(expr string) bool {
 	// https://developer.hashicorp.com/terraform/language/expressions/references
 	for _, prefix := range []string{
-		"var.", "module.", "local.", "resource.", "data.", "terraform.",
+		"var.", "module.", "local.", "resource.", "terraform.",
 		"path.", "each.", "count.", "self.",
 	} {
 		if strings.HasPrefix(expr, prefix) {
@@ -130,7 +130,7 @@ func evalCelExpression(expr string, env *cel.Env, inputData map[string]any, envV
 	if err != nil {
 		return nil, err
 	}
-	out, _, err := program.Eval(map[string]any{"input": inputData, "env": envVars, "vars": config.Variables})
+	out, _, err := program.Eval(map[string]any{"input": inputData, "env": envVars, "vars": config.Variables, "data": config.LoadedData})
 	if err != nil {
 		// Handle missing key errors based on strict mode
 		if isMissingKeyError(err) {
@@ -257,6 +257,7 @@ func evalCelExpressionWithItem(expr string, env *cel.Env, inputData map[string]a
 		"item":       item,
 		"item_index": itemIndex,
 		"vars":       config.Variables,
+		"data":       config.LoadedData,
 	})
 	if err != nil {
 		// Handle missing key errors based on strict mode
