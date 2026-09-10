@@ -4,15 +4,18 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/devsebastianops/watt-tf/internal/data"
 	p "github.com/devsebastianops/watt-tf/internal/plugin"
 	"github.com/devsebastianops/x/parser"
 )
 
 func LoadConfig(filePath string) (*Config, error) {
 	config := &Config{
-		Transform: []Transformable{},
-		Plugins:   []p.Plugin{},
-		Variables: map[string]any{},
+		Transform:  []Transformable{},
+		Plugins:    []p.Plugin{},
+		Variables:  map[string]any{},
+		Data:       map[string]data.Data{},
+		LoadedData: map[string]any{},
 	}
 
 	// Load the main config file
@@ -45,6 +48,7 @@ func LoadConfig(filePath string) (*Config, error) {
 				config.Plugins = append(config.Plugins, includedConfig.Plugins...)
 				// Append variables from included config
 				config.Variables = mergeMaps(config.Variables, includedConfig.Variables)
+				config.Data = mergeDataMaps(config.Data, includedConfig.Data)
 			}
 		}
 	}
@@ -61,6 +65,7 @@ func LoadConfig(filePath string) (*Config, error) {
 	config.Plugins = append(config.Plugins, mainConfig.Plugins...)
 	// Append main config variables
 	config.Variables = mergeMaps(config.Variables, mainConfig.Variables)
+	config.Data = mergeDataMaps(config.Data, mainConfig.Data)
 
 	return config, nil
 }
@@ -73,14 +78,37 @@ func loadConfigWithoutIncludes(filePath string) (*Config, error) {
 	}
 
 	config := &Config{
-		Transform: []Transformable{},
-		Plugins:   []p.Plugin{},
-		Variables: map[string]any{},
+		Transform:  []Transformable{},
+		Plugins:    []p.Plugin{},
+		Variables:  map[string]any{},
+		Data:       map[string]data.Data{},
+		LoadedData: map[string]any{},
 	}
 
 	// Parse variables if present
 	if variables, ok := configMap["variables"].(map[string]any); ok {
 		config.Variables = variables
+	}
+
+	// Parse additional data sources if present
+	if dataMap, ok := configMap["data"].(map[string]any); ok {
+		for dataKey, rawData := range dataMap {
+			dataConfig, ok := rawData.(map[string]any)
+			if !ok {
+				return nil, fmt.Errorf("invalid data entry '%s'", dataKey)
+			}
+
+			dataType, _ := dataConfig["type"].(string)
+			dataPath, _ := dataConfig["path"].(string)
+			if dataType == "" || dataPath == "" {
+				return nil, fmt.Errorf("data entry '%s' must include 'type' and 'path'", dataKey)
+			}
+			if !filepath.IsAbs(dataPath) {
+				dataPath = filepath.Join(filepath.Dir(filePath), dataPath)
+			}
+
+			config.Data[dataKey] = data.NewData(dataType, dataPath)
+		}
 	}
 
 	// Parse transforms
@@ -181,6 +209,16 @@ func loadConfigWithoutIncludes(filePath string) (*Config, error) {
 func mergeMaps(dest, src map[string]any) map[string]any {
 	if dest == nil {
 		dest = make(map[string]any)
+	}
+	for k, v := range src {
+		dest[k] = v
+	}
+	return dest
+}
+
+func mergeDataMaps(dest, src map[string]data.Data) map[string]data.Data {
+	if dest == nil {
+		dest = make(map[string]data.Data)
 	}
 	for k, v := range src {
 		dest[k] = v

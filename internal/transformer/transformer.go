@@ -27,6 +27,7 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 		cel.Variable("item", cel.AnyType),
 		cel.Variable("item_index", cel.IntType),
 		cel.Variable("vars", cel.MapType(cel.StringType, cel.AnyType)),
+		cel.Variable("data", cel.MapType(cel.StringType, cel.AnyType)),
 		cel.Macros(cel.StandardMacros...),
 		cel.OptionalTypes(),
 		ext.Encoders(),
@@ -35,6 +36,17 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 		ext.Sets(),
 		ext.Regex(),
 	)
+
+	// Load additional data
+	data := map[string]interface{}{}
+	for key, dataSource := range config.Data {
+		var err error
+		data[key], err = dataSource.Load()
+		if err != nil {
+			return nil, fmt.Errorf("failed to load data for key '%s': %w", key, err)
+		}
+	}
+	config.LoadedData = data
 
 	// Register custom wtf functions
 	logger.Debug("registering custom wtf functions")
@@ -99,6 +111,7 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 				"item":       nil,
 				"item_index": 0,
 				"vars":       config.Variables,
+				"data":       config.LoadedData,
 			})
 			if err != nil {
 				return nil, fmt.Errorf("failed to evaluate for_each expression '%s': %w", forEach, err)
