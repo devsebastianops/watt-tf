@@ -12,19 +12,24 @@ This section contains real world examples of how to use the library in different
 
 This section contains more basic how-to's to demonstrate solutions for actual problems. Each one has a scenario and the solution with explanations, if needed.
 
+### Basics
+
+- **[Loops](./loops.md)** - How to define and use loops within Watt TF blueprints.
+- **[Terraform references](./terraform-references.md)** - Working with Terraform references like `var`, `module`, `local`, or `resource` within Watt TF blueprints.
+- **[Functions](./functions.md)** - How to use already provided CEL functions within Watt TF blueprints.
+- **[Environment Variables](./environment-variables.md)** - Using environment variables within Watt TF blueprints.
+- **[List Values](./list-values.md)** - How to work with list values inside blueprints.
+- **[Includes](./includes.md)** - How to include external blueprints within a blueprint.
+- **[Preserve Types](./preserve-types.md)** - Demonstrates how types are preserved via CEL expressions.
+- **[Reoccurring variables](./reoccuring-variables.md)** - Externalize complex and reoccurring variables for reuse across blueprints.
+
+### Advanced
+
 - **[Dynamic targets](./dynamic-targets.md)** - Use interpolation to create dynamic target references.
 - **[Deep Merging](./deep-merging.md)** - Explains the concept of extending already configured targets with more values via deep merging.
-- **[Nested Targets](./nested-paths.md)** - How to define nested targets and span up complex objects.
-- **[Preserve Types](./preserve-types.md)** - Demonstrates how types are preserved via CEL expressions.
-- **[List Values](./list-values.md)** - How to work with list values inside blueprints.
-- **[Environment Variables](./environment-variables.md)** - Using environment variables within Watt TF blueprints.
-- **[Includes](./includes.md)** - How to include external blueprints within a blueprint.
+- **[Nested Paths](./nested-paths.md)** - How to define nested target paths and span up complex objects.
 - **[Escaping targets](./escaping-targets.md)** - Escaping target references that includes `.` characters.
-- **[Terraform references](./terraform-references.md)** - Working with Terraform references like `var`, `module`, `local`, or `resource` within Watt TF blueprints.
 - **[Loading external data](./loading-external-data.md)** - How to load and use external data within Watt TF blueprints.
-- **[Reoccuring variables](./reoccuring-variables.md)** - Externalize complex and reoccuring variables for reuse across blueprints.
 - **[Optional Values](./optional-values.md)** - Explains how to define and use optional values within Watt TF blueprints.
 - **[Conditional Values](./conditional-values.md)** - Demonstrates how to define and use conditional values within Watt TF blueprints.
-- **[Loops](./loops.md)** - How to define and use loops within Watt TF blueprints.
-- **[Functions](./functions.md)** - How to use already provided CEL functions within Watt TF blueprints.
 - **[Plugins](./plugins.md)** - How to use and manage plugins within Watt TF blueprints.
