@@ -8,12 +8,20 @@ type FileData struct {
 }
 
 func (f FileData) Load() (map[string]any, error) {
-	parser, err := parser.NewParser(f.Path)
+	return f.LoadAt(f.Path)
+}
+
+func (f FileData) SourcePath() string {
+	return f.Path
+}
+
+func (f FileData) LoadAt(path string) (map[string]any, error) {
+	parser, err := parser.NewParser(path)
 	if err != nil {
 		return nil, err
 	}
 
-	data, err := parser.Parse(f.Path)
+	data, err := parser.Parse(path)
 	if err != nil {
 		return nil, err
 	}
