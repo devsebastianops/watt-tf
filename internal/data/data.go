@@ -6,6 +6,8 @@ const (
 
 type Data interface {
 	Load() (map[string]any, error)
+	SourcePath() string
+	LoadAt(path string) (map[string]any, error)
 }
 
 func NewData(dataType, path string) Data {

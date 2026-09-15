@@ -1,0 +1,13 @@
+data:
+  project:
+    type: file
+    path: ${input.projectfile}
+  
+transform:
+- target: module.microservice
+  value:
+    name: "${input.name}"
+    port: "${input.port}"
+    project: "${data.project.id}"
+    environment: "${data.project.environment}"
+    image: "${input.image}"

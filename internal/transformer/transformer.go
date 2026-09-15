@@ -37,17 +37,6 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 		ext.Regex(),
 	)
 
-	// Load additional data
-	data := map[string]interface{}{}
-	for key, dataSource := range config.Data {
-		var err error
-		data[key], err = dataSource.Load()
-		if err != nil {
-			return nil, fmt.Errorf("failed to load data for key '%s': %w", key, err)
-		}
-	}
-	config.LoadedData = data
-
 	// Register custom wtf functions
 	logger.Debug("registering custom wtf functions")
 	env, err := RegisterWtfFunctions(baseEnv)
@@ -56,6 +45,25 @@ func Transform(input map[string]interface{}, envVars map[string]string, config *
 		return nil, fmt.Errorf("failed to register wtf functions: %w", err)
 	}
 	logger.Debug("custom wtf functions registered successfully")
+
+	// Load additional data after the CEL environment is ready so paths can be interpolated.
+	data := map[string]interface{}{}
+	for key, dataSource := range config.Data {
+		dataPath, err := interpolate(dataSource.SourcePath(), env, input, envVars, strict, config)
+		if err != nil {
+			return nil, fmt.Errorf("failed to interpolate data path for key '%s': %w", key, err)
+		}
+		path, ok := dataPath.(string)
+		if !ok {
+			return nil, fmt.Errorf("interpolated data path for key '%s' must be a string, got %T", key, dataPath)
+		}
+
+		data[key], err = dataSource.LoadAt(path)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load data for key '%s': %w", key, err)
+		}
+	}
+	config.LoadedData = data
 
 	for _, transformable := range transformables {
 		target := transformable.Target

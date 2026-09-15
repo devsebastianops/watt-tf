@@ -1,0 +1,6 @@
+{
+    "name": "my-service",
+    "port": 8080,
+    "image": "my-service-image",
+    "projectfile": "project.json"
+}
